@@ -54,6 +54,7 @@
             </nav>
 
             <div class="flex items-center gap-3 text-xs sm:text-sm">
+                <a href="{{ url_for('admin.change_password') }}" class="text-zinc-400 hover:text-gold transition" title="ប្តូរពាក្យសម្ងាត់"><i class="fa-solid fa-key"></i></a>
                 <a href="{{ url_for('index') }}" class="text-zinc-400 hover:text-gold transition"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>មើលគេហទំព័រ</a>
                 <a href="{{ url_for('admin.logout') }}" class="text-red-400 hover:text-red-300 transition"><i class="fa-solid fa-right-from-bracket mr-1"></i>ចាកចេញ</a>
             </div>

@@ -47,6 +47,9 @@
                                             <option value="admin" {{ 'selected' if staff_user.role == 'admin' }}>Admin</option>
                                         </select>
                                     </form>
+                                    <form method="post" action="{{ url_for('admin.reset_user_password', user_id=staff_user.id) }}" class="inline" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់កំណត់ពាក្យសម្ងាត់ថ្មីសម្រាប់ &quot;{{ staff_user.name }}&quot; មែនទេ?')">
+                                        <button type="submit" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="កំណត់ពាក្យសម្ងាត់ថ្មី"><i class="fa-solid fa-key"></i></button>
+                                    </form>
                                     <form method="post" action="{{ url_for('admin.delete_staff', user_id=staff_user.id) }}" class="inline" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់ដកសិទ្ធិបុគ្គលិករបស់ &quot;{{ staff_user.name }}&quot; មែនទេ? (គណនីនឹងក្លាយជាអតិថិជនធម្មតា)')">
                                         <button type="submit" class="text-zinc-400 hover:text-red-500 transition inline-block px-1.5" title="ដកសិទ្ធិបុគ្គលិក"><i class="fa-solid fa-user-slash"></i></button>
                                     </form>
@@ -97,6 +100,7 @@
                             <th class="px-4 py-3 font-semibold hidden sm:table-cell">ចូលរួម</th>
                             <th class="px-4 py-3 font-semibold text-right">កាក់</th>
                             <th class="px-4 py-3 font-semibold text-right">VIP</th>
+                            <th class="px-4 py-3 font-semibold text-right">សកម្មភាព</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-800">
@@ -114,6 +118,11 @@
                                 {% else %}
                                     <span class="text-zinc-600 text-[11px]">&mdash;</span>
                                 {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <form method="post" action="{{ url_for('admin.reset_user_password', user_id=client.id) }}" class="inline" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់កំណត់ពាក្យសម្ងាត់ថ្មីសម្រាប់ &quot;{{ client.name }}&quot; មែនទេ?')">
+                                    <button type="submit" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="កំណត់ពាក្យសម្ងាត់ថ្មី"><i class="fa-solid fa-key"></i></button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}

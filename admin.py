@@ -1,3 +1,4 @@
+import secrets
 from datetime import datetime, timezone
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, session, url_for
@@ -444,3 +445,37 @@ def delete_staff(user_id):
         db.session.commit()
         flash('បានដកសិទ្ធិបុគ្គលិករួចរាល់ (គណនីប្រែជាអតិថិជនធម្មតា)', 'success')
     return redirect(url_for('admin.users'))
+
+
+@admin_bp.post('/users/<int:user_id>/reset-password')
+@admin_required
+def reset_user_password(user_id):
+    target = User.query.get_or_404(user_id)
+    new_password = secrets.token_urlsafe(6)
+    target.set_password(new_password)
+    db.session.commit()
+    flash(f'ពាក្យសម្ងាត់ថ្មីសម្រាប់ {target.name} ({target.email}): {new_password} — សូមចម្លងទុកឥឡូវនេះ វានឹងមិនបង្ហាញម្តងទៀតទេ', 'success')
+    return redirect(url_for('admin.users'))
+
+
+@admin_bp.route('/account/password', methods=['GET', 'POST'])
+@staff_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form.get('current_password', '')
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        user = get_current_user()
+
+        if not user.check_password(current_password):
+            flash('ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវទេ', 'error')
+        elif len(new_password) < 6:
+            flash('ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច ៦ តួ', 'error')
+        elif new_password != confirm_password:
+            flash('ការបញ្ជាក់ពាក្យសម្ងាត់ថ្មីមិនត្រូវគ្នាទេ', 'error')
+        else:
+            user.set_password(new_password)
+            db.session.commit()
+            flash('បានប្តូរពាក្យសម្ងាត់រួចរាល់', 'success')
+            return redirect(url_for('admin.change_password'))
+    return render_template('admin/change_password.html')
