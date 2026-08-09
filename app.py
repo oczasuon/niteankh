@@ -81,6 +81,14 @@ def create_app(start_services=True):
         telegram_verify.start_background_poller(app)
         telegram_userbot.start_userbot_listener(app)
 
+    @app.before_request
+    def redirect_www_to_apex():
+        # Keeps one canonical host — required for the Telegram Login Widget,
+        # whose domain (set via @BotFather) only matches a single exact host.
+        host = request.host.lower()
+        if host.startswith('www.'):
+            return redirect(request.url.replace(host, host[4:], 1), code=301)
+
     @app.context_processor
     def inject_globals():
         return dict(
