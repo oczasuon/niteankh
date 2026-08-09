@@ -6,7 +6,7 @@
     <div class="min-w-0">
 
         <!-- PLAYER -->
-        <div class="relative w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg">
+        <div class="sticky top-14 sm:top-16 z-30 w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg">
             {% if movie.has_thumbnail %}
                 <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
             {% else %}
