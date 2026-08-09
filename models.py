@@ -23,6 +23,10 @@ class User(db.Model):
     role = db.Column(db.String(20), default=ROLE_CLIENT, nullable=False)
     balance = db.Column(db.Integer, default=0, nullable=False)
     vip_expiry = db.Column(db.DateTime, nullable=True)
+    phone = db.Column(db.String(30), nullable=True)
+    sex = db.Column(db.String(10), nullable=True)  # 'male' | 'female' | 'other'
+    dob = db.Column(db.Date, nullable=True)
+    location = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=now)
 
     def set_password(self, password):

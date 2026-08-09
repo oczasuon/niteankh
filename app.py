@@ -302,6 +302,11 @@ def register_routes(app):
         user = get_current_user()
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
+        phone = request.form.get('phone', '').strip()
+        sex = request.form.get('sex', '').strip()
+        dob = request.form.get('dob', '').strip()
+        location = request.form.get('location', '').strip()
+
         if name:
             user.name = name
         if email and email != user.email:
@@ -309,8 +314,41 @@ def register_routes(app):
                 flash('អ៊ីមែលនេះត្រូវបានប្រើរួចហើយ', 'error')
                 return redirect(url_for('profile'))
             user.email = email
+
+        user.phone = phone or None
+        user.sex = sex if sex in ('male', 'female', 'other') else None
+        user.location = location or None
+        if dob:
+            try:
+                user.dob = datetime.strptime(dob, '%Y-%m-%d').date()
+            except ValueError:
+                flash('ថ្ងៃខែឆ្នាំកំណើតមិនត្រឹមត្រូវទេ', 'error')
+                return redirect(url_for('profile'))
+        else:
+            user.dob = None
+
         db.session.commit()
         flash('បានរក្សាទុករួចរាល់', 'success')
+        return redirect(url_for('profile'))
+
+    @app.post('/profile/change-password')
+    @login_required
+    def profile_change_password():
+        user = get_current_user()
+        current_password = request.form.get('current_password', '')
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if not user.check_password(current_password):
+            flash('ពាក្យសម្ងាត់បច្ចុប្បន្នមិនត្រឹមត្រូវទេ', 'error')
+        elif len(new_password) < 6:
+            flash('ពាក្យសម្ងាត់ថ្មីត្រូវមានយ៉ាងតិច ៦ តួ', 'error')
+        elif new_password != confirm_password:
+            flash('ការបញ្ជាក់ពាក្យសម្ងាត់ថ្មីមិនត្រូវគ្នាទេ', 'error')
+        else:
+            user.set_password(new_password)
+            db.session.commit()
+            flash('បានប្តូរពាក្យសម្ងាត់រួចរាល់', 'success')
         return redirect(url_for('profile'))
 
     @app.post('/profile/history/clear')

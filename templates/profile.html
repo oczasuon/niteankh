@@ -94,6 +94,7 @@
         </div>
 
         <div id="tab-settings" class="tab-panel py-5 max-w-md">
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">ព័ត៌មានប្រវត្តិរូប</h2>
             <form method="post" action="{{ url_for('profile_settings') }}" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ឈ្មោះពេញ</label>
@@ -103,8 +104,51 @@
                     <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">អ៊ីមែល</label>
                     <input name="email" type="email" value="{{ current_user.email }}" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">លេខទូរស័ព្ទ</label>
+                    <input name="phone" type="tel" value="{{ current_user.phone or '' }}" placeholder="0xx xxx xxx" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ភេទ</label>
+                        <select name="sex" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                            <option value="">មិនបញ្ជាក់</option>
+                            <option value="male" {{ 'selected' if current_user.sex == 'male' }}>ប្រុស</option>
+                            <option value="female" {{ 'selected' if current_user.sex == 'female' }}>ស្រី</option>
+                            <option value="other" {{ 'selected' if current_user.sex == 'other' }}>ផ្សេងទៀត</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ថ្ងៃខែឆ្នាំកំណើត</label>
+                        <input name="dob" type="date" value="{{ current_user.dob.isoformat() if current_user.dob else '' }}" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ទីតាំង</label>
+                    <input name="location" type="text" value="{{ current_user.location or '' }}" placeholder="ភ្នំពេញ" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                </div>
                 <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">រក្សាទុក</button>
             </form>
+
+            <div class="mt-8 pt-6 border-t border-gray-200 dark:border-zinc-800">
+                <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">ប្តូរពាក្យសម្ងាត់</h2>
+                <form method="post" action="{{ url_for('profile_change_password') }}" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ពាក្យសម្ងាត់បច្ចុប្បន្ន</label>
+                        <input name="current_password" required type="password" placeholder="••••••••" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ពាក្យសម្ងាត់ថ្មី (យ៉ាងតិច ៦ តួ)</label>
+                        <input name="new_password" required minlength="6" type="password" placeholder="••••••••" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">បញ្ជាក់ពាក្យសម្ងាត់ថ្មី</label>
+                        <input name="confirm_password" required minlength="6" type="password" placeholder="••••••••" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                    </div>
+                    <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">ប្តូរពាក្យសម្ងាត់</button>
+                </form>
+            </div>
+
             <div class="mt-8 pt-5 border-t border-gray-200 dark:border-zinc-800">
                 <a href="{{ url_for('logout') }}" class="text-red-500 hover:text-red-600 text-xs sm:text-sm font-semibold flex items-center gap-2 transition"><i class="fa-solid fa-right-from-bracket"></i> ចាកចេញពីគណនី</a>
             </div>
