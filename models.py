@@ -28,6 +28,7 @@ class User(db.Model):
     dob = db.Column(db.Date, nullable=True)
     location = db.Column(db.String(255), nullable=True)
     google_id = db.Column(db.String(64), unique=True, nullable=True)
+    telegram_id = db.Column(db.String(64), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=now)
 
     def set_password(self, password):

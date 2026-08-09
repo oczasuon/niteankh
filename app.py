@@ -16,7 +16,7 @@ from helpers import (
     REDEEM_CODES, TOPUP_PACKAGES, VIP_PLANS, add_guest_watch_seconds, calculate_coins_for_khr,
     get_categories, get_current_user, get_setting, guest_time_limit_reached,
     guest_would_exceed_movie_limit, login_required, register_guest_movie_view,
-    safe_redirect_target,
+    safe_redirect_target, verify_telegram_auth,
 )
 from models import BankTransaction, Episode, HistoryItem, Movie, MyListItem, User, WalletTransaction, db
 
@@ -66,6 +66,9 @@ def create_app(start_services=True):
             client_kwargs={'scope': 'openid email profile'},
         )
 
+    app.config['TELEGRAM_LOGIN_BOT_TOKEN'] = os.environ.get('TELEGRAM_LOGIN_BOT_TOKEN')
+    app.config['TELEGRAM_LOGIN_BOT_USERNAME'] = os.environ.get('TELEGRAM_LOGIN_BOT_USERNAME')
+
     from admin import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
 
@@ -80,7 +83,10 @@ def create_app(start_services=True):
 
     @app.context_processor
     def inject_globals():
-        return dict(current_user=get_current_user(), categories=get_categories())
+        return dict(
+            current_user=get_current_user(), categories=get_categories(),
+            telegram_login_bot_username=app.config['TELEGRAM_LOGIN_BOT_USERNAME'],
+        )
 
     register_routes(app)
     return app
@@ -424,6 +430,35 @@ def register_routes(app):
         session['user_id'] = user.id
         target = safe_redirect_target(session.pop('login_next', None))
         return redirect(target or url_for('index'))
+
+    @app.route('/login/telegram/callback')
+    def login_telegram_callback():
+        bot_token = app.config['TELEGRAM_LOGIN_BOT_TOKEN']
+        if not bot_token:
+            flash('ការចូលប្រើតាម Telegram មិនទាន់អាចប្រើបានទេ', 'error')
+            return redirect(url_for('login'))
+
+        data = request.args.to_dict()
+        next_target = safe_redirect_target(data.pop('next', None))
+        if not verify_telegram_auth(data, bot_token):
+            flash('ការផ្ទៀងផ្ទាត់ Telegram មិនត្រឹមត្រូវទេ', 'error')
+            return redirect(url_for('login'))
+
+        telegram_id = data.get('id')
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        username = data.get('username', '').strip()
+        name = f'{first_name} {last_name}'.strip() or username or 'អ្នកប្រើប្រាស់ Telegram'
+
+        user = User.query.filter_by(telegram_id=telegram_id).first()
+        if not user:
+            user = User(name=name, email=f'tg{telegram_id}@telegram.niteankh.local', telegram_id=telegram_id)
+            user.set_password(secrets.token_urlsafe(32))  # unusable random password
+            db.session.add(user)
+            db.session.commit()
+
+        session['user_id'] = user.id
+        return redirect(next_target or url_for('index'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():

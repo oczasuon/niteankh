@@ -1,10 +1,36 @@
+import hashlib
+import hmac
 import re
+import time
 from functools import wraps
 from urllib.parse import parse_qs, urlparse
 
 from flask import flash, redirect, request, session, url_for
 
 from models import Category, Setting, User, db
+
+TELEGRAM_AUTH_MAX_AGE = 24 * 60 * 60  # reject login payloads older than this (replay protection)
+
+
+def verify_telegram_auth(data, bot_token):
+    """Verifies the signed payload from Telegram's Login Widget per Telegram's
+    documented algorithm: https://core.telegram.org/widgets/login#checking-authorization"""
+    data = dict(data)
+    received_hash = data.pop('hash', None)
+    if not received_hash:
+        return False
+
+    auth_date = data.get('auth_date')
+    try:
+        if not auth_date or time.time() - int(auth_date) > TELEGRAM_AUTH_MAX_AGE:
+            return False
+    except ValueError:
+        return False
+
+    check_string = '\n'.join(f'{k}={v}' for k, v in sorted(data.items()) if v is not None)
+    secret_key = hashlib.sha256(bot_token.encode()).digest()
+    computed_hash = hmac.new(secret_key, check_string.encode(), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(computed_hash, received_hash)
 
 
 def get_categories():
