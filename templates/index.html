@@ -4,11 +4,12 @@
 {% block content %}
 <!-- HERO AUTO-PLAY SLIDER -->
 <section class="relative w-full bg-black overflow-hidden">
-    <div id="heroSlider" class="relative h-[260px] sm:h-[380px] md:h-auto md:aspect-[8/3] w-full">
+    <div id="heroSlider" class="relative h-[260px] sm:h-[380px] md:h-[480px] lg:h-[520px] w-full">
         {% for movie in hero_movies %}
         <div class="hero-slide absolute inset-0 transition-opacity duration-700 {{ 'opacity-100 z-10' if loop.first else 'opacity-0 pointer-events-none' }}">
             {% if movie.has_slide_image %}
-                <img src="{{ media_url('slides', movie.slide_image_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+                <img src="{{ media_url('slides', movie.slide_image_filename) }}" class="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-50" aria-hidden="true">
+                <img src="{{ media_url('slides', movie.slide_image_filename) }}" class="absolute inset-0 w-full h-full object-contain">
             {% else %}
                 <div class="absolute inset-0 bg-gradient-to-br {{ movie.bg_grad }}"></div>
             {% endif %}
