@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}NITEANKH - Khmer Streaming Platform{% endblock %}
+
+{% block content %}
+<!-- HERO AUTO-PLAY SLIDER -->
+<section class="relative w-full bg-black overflow-hidden">
+    <div id="heroSlider" class="relative h-[260px] sm:h-[380px] md:h-[480px] lg:h-[520px] w-full">
+        {% for movie in hero_movies %}
+        <div class="hero-slide absolute inset-0 transition-opacity duration-700 {{ 'opacity-100 z-10' if loop.first else 'opacity-0 pointer-events-none' }}">
+            {% if movie.has_slide_image %}
+                <img src="{{ media_url('slides', movie.slide_image_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+            {% else %}
+                <div class="absolute inset-0 bg-gradient-to-br {{ movie.bg_grad }}"></div>
+            {% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-lightbg dark:from-darkbg via-black/40 to-transparent transition-colors duration-200"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent"></div>
+
+            <div class="absolute bottom-10 sm:bottom-12 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-xl space-y-2 sm:space-y-3">
+                    <span class="inline-flex items-center gap-1 bg-gold text-black text-[10px] font-bold px-2 py-0.5 rounded">
+                        <i class="fa-solid fa-thumbs-up text-[9px]"></i> កំពុងពេញនិយម
+                    </span>
+                    <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold text-white tracking-wide">{{ movie.title }}</h1>
+                    <p class="text-xs sm:text-sm text-gray-300 line-clamp-2 hidden sm:block">{{ movie.description }}</p>
+                    <div class="flex flex-wrap items-center gap-2 text-[10px] sm:text-xs">
+                        {% if movie.vip %}<span class="bg-gold/20 text-gold border border-gold/50 px-1.5 py-0.5 rounded font-semibold">VIP</span>{% endif %}
+                        <span class="bg-zinc-800/80 text-gray-300 border border-zinc-700 px-1.5 py-0.5 rounded">{{ movie.quality }}</span>
+                        <span class="flex items-center gap-1 bg-zinc-800/80 text-gray-300 border border-zinc-700 px-1.5 py-0.5 rounded">
+                            <i class="fa-solid fa-star text-gold"></i> {{ movie.rating }}
+                        </span>
+                        <span class="text-zinc-400">{{ movie.year }}</span>
+                    </div>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="{{ url_for('watch', movie_id=movie.id) }}" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded flex items-center gap-2 transition w-fit">
+                            <i class="fa-solid fa-play"></i> មើលឥឡូវ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <div id="heroDots" class="absolute bottom-3 sm:bottom-4 left-0 right-0 flex items-center justify-center gap-1.5 z-20">
+            {% for movie in hero_movies %}
+                <button type="button" class="hero-dot h-1.5 rounded-full transition-all {{ 'w-5 bg-gold' if loop.first else 'w-1.5 bg-zinc-600' }}"></button>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CATEGORY SHORTCUTS -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+        <a href="{{ url_for('movies') }}" class="px-4 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-gold/60 text-gold whitespace-nowrap shadow-sm">ទាំងអស់</a>
+        {% for cat in categories %}
+            <a href="{{ url_for('movies', category=cat) }}" class="px-4 py-1.5 rounded-full bg-white dark:bg-zinc-900/80 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-gray-300 hover:border-gold/50 whitespace-nowrap shadow-sm transition">{{ cat }}</a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- GRID -->
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-2">
+    <section>
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-clapperboard text-gold"></i> ខ្លឹមសារទាំងអស់
+            </h2>
+            <a href="{{ url_for('movies') }}" class="text-xs text-gold hover:underline">មើលទាំងអស់ &rarr;</a>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {% for movie in movies %}
+                {% include '_movie_card.html' %}
+            {% endfor %}
+        </div>
+    </section>
+
+    {% include '_pagination.html' %}
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let heroIndex = 0;
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    const heroDots = document.querySelectorAll('.hero-dot');
+    let heroTimer = null;
+
+    function goToSlide(index) {
+        heroSlides.forEach((s, i) => {
+            s.classList.toggle('opacity-100', i === index);
+            s.classList.toggle('z-10', i === index);
+            s.classList.toggle('opacity-0', i !== index);
+            s.classList.toggle('pointer-events-none', i !== index);
+        });
+        heroDots.forEach((d, i) => {
+            d.classList.toggle('w-5', i === index);
+            d.classList.toggle('bg-gold', i === index);
+            d.classList.toggle('w-1.5', i !== index);
+            d.classList.toggle('bg-zinc-600', i !== index);
+        });
+        heroIndex = index;
+    }
+
+    function startHeroAutoplay() {
+        stopHeroAutoplay();
+        if (heroSlides.length > 1) heroTimer = setInterval(() => goToSlide((heroIndex + 1) % heroSlides.length), 5000);
+    }
+    function stopHeroAutoplay() { if (heroTimer) clearInterval(heroTimer); }
+
+    heroDots.forEach((dot, i) => dot.addEventListener('click', () => { goToSlide(i); startHeroAutoplay(); }));
+
+    if (heroSlides.length > 0) {
+        startHeroAutoplay();
+        const heroSlider = document.getElementById('heroSlider');
+        heroSlider.addEventListener('mouseenter', stopHeroAutoplay);
+        heroSlider.addEventListener('mouseleave', startHeroAutoplay);
+    }
+</script>
+{% endblock %}

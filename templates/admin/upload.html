@@ -1,0 +1,214 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ 'កែសម្រួលខ្លឹមសារ' if movie else 'បង្ហោះខ្លឹមសារ' }} - NITEANKH Admin{% endblock %}
+
+{% block extra_head %}
+<style>
+    .swatch.selected { outline: 2px solid #C59B27; outline-offset: 2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <h1 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+        <i class="fa-solid {{ 'fa-pen-to-square' if movie else 'fa-cloud-arrow-up' }} text-gold"></i>
+        {{ 'កែសម្រួលខ្លឹមសារ' if movie else 'បង្ហោះខ្លឹមសារវីដេអូថ្មី' }}
+    </h1>
+    <p class="text-xs sm:text-sm text-zinc-500 mt-1 mb-6">
+        ខ្លឹមសារនេះនឹងបង្ហាញភ្លាមៗនៅលើទំព័រដើម ការស្វែងរក និងទំព័រភាពយន្ត
+    </p>
+
+    <form method="post" enctype="multipart/form-data" class="bg-cardbg border border-zinc-800 rounded-xl p-5 sm:p-6 space-y-5">
+        <div>
+            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ចំណងជើងរឿង *</label>
+            <input name="title" required type="text" value="{{ movie.title if movie else '' }}" placeholder="ឧ. នាងត្រកួន ២" class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ប្រភេទ *</label>
+                <select name="category" required class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                    {% for cat in categories %}
+                        <option value="{{ cat }}" {{ 'selected' if movie and movie.category == cat }}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">គុណភាព</label>
+                <select name="quality" class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                    <option value="FHD" {{ 'selected' if movie and movie.quality == 'FHD' }}>FHD</option>
+                    <option value="4K" {{ 'selected' if movie and movie.quality == '4K' }}>4K</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ចំនួនភាគ *</label>
+                <input name="total_episodes" required type="number" min="1" max="999" value="{{ movie.total_episodes if movie else 12 }}" class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ឆ្នាំ</label>
+                <input name="year" type="number" min="2000" max="2100" value="{{ movie.year if movie else 2026 }}" class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ពិន្ទុ (0-10)</label>
+                <input name="rating" type="number" min="0" max="10" step="0.1" value="{{ movie.rating if movie else 8.0 }}" class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ឯកសារវីដេអូ {{ '' if movie else '*' }}</label>
+            <input name="video" type="file" accept="video/*" class="w-full text-xs sm:text-sm text-zinc-300 file:mr-3 file:bg-gold file:hover:bg-gold-light file:text-black file:font-semibold file:text-xs file:px-3.5 file:py-2 file:rounded-lg file:border-0 file:cursor-pointer bg-zinc-900/90 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors cursor-pointer">
+            {% if movie and movie.has_video %}
+                <p class="text-[10px] text-zinc-500 mt-1">វីដេអូបច្ចុប្បន្ន៖ {{ movie.video_filename }} &mdash; ជ្រើសរើសឯកសារថ្មីដើម្បីជំនួស ឬទុកទទេដើម្បីរក្សាវីដេអូដដែល</p>
+                <video controls class="w-full mt-3 rounded-lg bg-black max-h-64">
+                    <source src="{{ media_url('videos', movie.video_filename) }}">
+                </video>
+            {% endif %}
+
+            <div class="flex items-center gap-3 my-3">
+                <div class="flex-1 h-px bg-zinc-800"></div>
+                <span class="text-[10px] text-zinc-600">ឬ</span>
+                <div class="flex-1 h-px bg-zinc-800"></div>
+            </div>
+
+            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">តំណ Embed (YouTube, Google Drive, Vimeo, ...)</label>
+            <input name="embed_url" type="url" placeholder="https://www.youtube.com/watch?v=..." value="{{ movie.embed_url if movie and movie.has_embed else '' }}" class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+            <p class="text-[10px] text-zinc-600 mt-1">ភ្ជាប់តំណភាគច្រើនផ្លាស់ប្តូរស្វ័យប្រវត្តិទៅជា Embed &mdash; ការផ្ទុកឯកសារខាងលើ និងតំណ Embed ជ្រើសរើសយកតែមួយ (ការផ្ទុកឯកសារថ្មីជំនួសតំណ Embed ចាស់ និងផ្ទុយមកវិញ)</p>
+            {% if movie and movie.has_embed %}
+                <div class="relative w-full aspect-video mt-3 rounded-lg overflow-hidden bg-black">
+                    <iframe src="{{ movie.embed_url }}" class="absolute inset-0 w-full h-full" allowfullscreen frameborder="0"></iframe>
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">រូបភាព Thumbnail (ស្រេចចិត្ត)</label>
+            <input name="thumbnail" type="file" accept="image/*" class="w-full text-xs sm:text-sm text-zinc-300 file:mr-3 file:bg-zinc-800 file:hover:bg-zinc-700 file:text-white file:font-semibold file:text-xs file:px-3.5 file:py-2 file:rounded-lg file:border-0 file:cursor-pointer bg-zinc-900/90 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors cursor-pointer">
+            <p class="text-[10px] text-zinc-600 mt-1">ប្រសិនបើមិនបញ្ចូលរូបភាព ប្រព័ន្ធនឹងប្រើពណ៌ខាងក្រោមជំនួសវិញ</p>
+            {% if movie and movie.has_thumbnail %}
+                <div class="flex items-center gap-3 mt-3">
+                    <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" class="w-28 sm:w-32 aspect-video rounded-md object-cover border border-zinc-700">
+                    <label class="text-xs text-red-400 hover:text-red-300 transition flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" name="remove_thumbnail" value="1" class="hidden peer">
+                        <span class="peer-checked:underline"><i class="fa-solid fa-xmark mr-1"></i>យកចេញ</span>
+                    </label>
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-zinc-400 mb-2">ពណ៌ជំនួស (ប្រើនៅពេលគ្មានរូបភាព Thumbnail)</label>
+            <div class="flex flex-wrap gap-2.5">
+                {% set gradients = [
+                    'from-teal-800 via-purple-900 to-rose-900',
+                    'from-blue-900 via-indigo-900 to-slate-900',
+                    'from-emerald-900 via-teal-900 to-cyan-950',
+                    'from-red-950 via-rose-900 to-amber-950',
+                    'from-purple-950 via-violet-900 to-fuchsia-950',
+                    'from-yellow-900 via-amber-900 to-orange-950',
+                ] %}
+                {% set current_grad = movie.bg_grad if movie else gradients[0] %}
+                {% for g in gradients %}
+                    <label>
+                        <input type="radio" name="bg_grad" value="{{ g }}" class="hidden peer" {{ 'checked' if g == current_grad }}>
+                        <span class="swatch {{ 'selected' if g == current_grad }} block w-12 h-8 rounded-md bg-gradient-to-r {{ g }} cursor-pointer peer-checked:[outline:2px_solid_#C59B27] peer-checked:[outline-offset:2px]"></span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ការពិពណ៌នា</label>
+            <textarea name="description" rows="3" placeholder="សេចក្តីសង្ខេបរឿង..." class="w-full bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors resize-none">{{ movie.description if movie else '' }}</textarea>
+        </div>
+
+        <label class="flex items-center gap-2 text-xs text-zinc-400">
+            <input name="vip" type="checkbox" {{ 'checked' if movie and movie.vip }} class="rounded border-zinc-700 text-gold focus:ring-gold">
+            កំណត់ជាមាតិកា VIP ប៉ុណ្ណោះ
+        </label>
+
+        <label class="flex items-center gap-2 text-xs text-zinc-400">
+            <input id="featuredCheckbox" name="featured" type="checkbox" {{ 'checked' if movie and movie.featured }} onchange="toggleSlideImageField()" class="rounded border-zinc-700 text-gold focus:ring-gold">
+            បង្ហាញនៅក្នុង Slide ទំព័រដើម (Hero Slider)
+        </label>
+
+        <div id="slideImageField" class="{{ '' if movie and movie.featured else 'hidden' }} pl-1 border-l-2 border-gold/40 ml-1.5">
+            <div class="pl-4">
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">រូបភាព Slide (Hero Banner) *</label>
+                <input name="slide_image" type="file" accept="image/*" class="w-full text-xs sm:text-sm text-zinc-300 file:mr-3 file:bg-gold file:hover:bg-gold-light file:text-black file:font-semibold file:text-xs file:px-3.5 file:py-2 file:rounded-lg file:border-0 file:cursor-pointer bg-zinc-900/90 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors cursor-pointer">
+                <p class="text-[10px] text-zinc-600 mt-1">រូបភាពទទឹង (ឧ. 1600&times;600) សម្រាប់បង្ហាញនៅលើ Banner ធំក្នុងទំព័រដើម</p>
+                {% if movie and movie.has_slide_image %}
+                    <img src="{{ media_url('slides', movie.slide_image_filename) }}" class="w-full max-w-sm aspect-[16/6] object-cover rounded-lg border border-zinc-700 mt-3">
+                    <p class="text-[10px] text-zinc-500 mt-1">ជ្រើសរើសរូបភាពថ្មីដើម្បីជំនួស ឬទុកទទេដើម្បីរក្សារូបភាពដដែល</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+            <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-sm px-6 py-2.5 rounded-lg transition">{{ 'រក្សាទុកការផ្លាស់ប្តូរ' if movie else 'បង្ហោះខ្លឹមសារ' }}</button>
+            <a href="{{ url_for('admin.manage') }}" class="text-xs text-zinc-400 hover:text-gold transition">បោះបង់</a>
+        </div>
+    </form>
+
+    {% if movie %}
+    <div class="mt-5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap">
+        <p class="text-xs sm:text-sm text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> កំពុងកែសម្រួល "{{ movie.title }}"</p>
+        <div class="flex gap-3 text-xs font-semibold">
+            <a href="{{ url_for('watch', movie_id=movie.id) }}" target="_blank" class="text-gold hover:underline">មើលនៅគេហទំព័រ &rarr;</a>
+            <a href="{{ url_for('admin.manage') }}" class="text-zinc-300 hover:underline">គ្រប់គ្រងខ្លឹមសារ &rarr;</a>
+        </div>
+    </div>
+
+    <section class="mt-8 bg-cardbg border border-zinc-800 rounded-xl p-5 sm:p-6">
+        <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-list-ol text-gold"></i> គ្រប់គ្រងវីដេអូតាមភាគ ({{ movie.total_episodes }} ភាគ)
+        </h2>
+        <p class="text-xs text-zinc-500 mb-1">ភាគទី ០១ ប្រើវីដេអូដែលបានផ្ទុកខាងលើរួចហើយ (កែវីដេអូភាគទី ០១ បាននៅផ្នែក "ឯកសារវីដេអូ" ខាងលើ)</p>
+        {% if movie.total_episodes > 1 %}
+        <p class="text-xs text-zinc-500 mb-4">ភាគខាងក្រោមមិនទាន់មានវីដេអូផ្ទាល់ខ្លួន នឹងប្រើវីដេអូខាងលើដដែលរហូតដល់អ្នកផ្ទុកឲ្យវា</p>
+        <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+            {% for ep_num in range(2, movie.total_episodes + 1) %}
+            {% set ep = episodes_by_num.get(ep_num) %}
+            <div class="flex flex-wrap items-start gap-2.5 bg-zinc-900/60 border border-zinc-800 rounded-lg p-2.5">
+                <span class="w-9 text-center text-xs font-bold text-white bg-zinc-800 rounded py-1.5 flex-shrink-0">{{ '%02d' % ep_num }}</span>
+
+                <div class="text-[11px] flex-shrink-0 w-32 pt-1.5">
+                    {% if ep and ep.video_filename %}
+                        <span class="text-emerald-400"><i class="fa-solid fa-circle-check"></i> មានវីដេអូ</span>
+                    {% elif ep and ep.embed_url %}
+                        <span class="text-emerald-400"><i class="fa-solid fa-link"></i> មានតំណ Embed</span>
+                    {% else %}
+                        <span class="text-zinc-500"><i class="fa-regular fa-circle"></i> ប្រើវីដេអូចម្បង</span>
+                    {% endif %}
+                </div>
+
+                <form method="post" enctype="multipart/form-data" action="{{ url_for('admin.upload_episode', movie_id=movie.id, ep_num=ep_num) }}" class="flex flex-col gap-1.5 flex-1 min-w-[220px]">
+                    <div class="flex items-center gap-2">
+                        <input type="file" name="video" accept="video/*" class="flex-1 min-w-0 text-[11px] text-zinc-400 file:mr-2 file:bg-zinc-800 file:hover:bg-zinc-700 file:text-white file:text-[10px] file:px-2.5 file:py-1.5 file:rounded file:border-0 file:cursor-pointer">
+                        <button type="submit" class="text-[11px] bg-gold hover:bg-gold-light text-black font-semibold px-2.5 py-1.5 rounded transition flex-shrink-0">ផ្ទុក</button>
+                    </div>
+                    <input type="url" name="embed_url" placeholder="ឬតំណ Embed (YouTube, Drive, ...)" value="{{ ep.embed_url if ep and ep.embed_url else '' }}" class="w-full text-[11px] text-zinc-300 bg-zinc-800/60 border border-zinc-700 rounded px-2 py-1.5 focus:outline-none focus:border-gold transition-colors">
+                </form>
+
+                {% if ep and (ep.video_filename or ep.embed_url) %}
+                <form method="post" action="{{ url_for('admin.delete_episode_video', movie_id=movie.id, ep_num=ep_num) }}" onsubmit="return confirm('លុបវីដេអូភាគ {{ ep_num }} មែនទេ?')" class="flex-shrink-0 pt-1.5">
+                    <button type="submit" class="text-zinc-500 hover:text-red-500 transition text-xs px-1"><i class="fa-solid fa-trash"></i></button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function toggleSlideImageField() {
+        document.getElementById('slideImageField').classList.toggle('hidden', !document.getElementById('featuredCheckbox').checked);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% if pagination.pages > 1 %}
+{% set qs = request.args.to_dict() %}
+{% set _ = qs.pop('page', None) %}
+{% set _ = qs.update(request.view_args) %}
+<div class="flex items-center justify-center gap-1.5 sm:gap-2 py-6 text-xs sm:text-sm">
+    {% if pagination.has_prev %}
+        <a href="{{ url_for(request.endpoint, page=pagination.prev_num, **qs) }}" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-zinc-800 shadow-sm transition">ថយក្រោយ</a>
+    {% else %}
+        <span class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-300 dark:text-zinc-700 border border-gray-200 dark:border-zinc-800 shadow-sm opacity-40 cursor-not-allowed">ថយក្រោយ</span>
+    {% endif %}
+
+    <div class="flex items-center gap-1.5">
+        {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p %}
+                {% if p == pagination.page %}
+                    <span class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold bg-amber-600 text-white shadow-sm">{{ p }}</span>
+                {% else %}
+                    <a href="{{ url_for(request.endpoint, page=p, **qs) }}" class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium bg-white dark:bg-zinc-900 text-gray-800 dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 border border-gray-200 dark:border-zinc-800 shadow-sm transition">{{ p }}</a>
+                {% endif %}
+            {% else %}
+                <span class="text-gray-400 dark:text-zinc-600 px-1">&hellip;</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {% if pagination.has_next %}
+        <a href="{{ url_for(request.endpoint, page=pagination.next_num, **qs) }}" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white font-medium border border-gray-200 dark:border-zinc-800 shadow-sm transition">មុខបន្ទាប់</a>
+    {% else %}
+        <span class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-300 dark:text-zinc-700 font-medium border border-gray-200 dark:border-zinc-800 shadow-sm opacity-40 cursor-not-allowed">មុខបន្ទាប់</span>
+    {% endif %}
+</div>
+{% endif %}

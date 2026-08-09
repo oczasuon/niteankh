@@ -1,0 +1,56 @@
+{% extends 'admin/base.html' %}
+{% block title %}ការកំណត់ - NITEANKH Admin{% endblock %}
+
+{% block content %}
+<main class="max-w-2xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <div>
+        <h1 class="text-lg sm:text-xl font-bold text-white">ការកំណត់</h1>
+        <p class="text-xs sm:text-sm text-zinc-500 mt-1">គ្រប់គ្រងព័ត៌មានទូទាត់ដែលបង្ហាញនៅទំព័រកាបូប</p>
+    </div>
+
+    <section class="bg-cardbg border border-zinc-800 rounded-xl p-5 sm:p-6">
+        <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-qrcode text-gold"></i> QR ការទូទាត់ (KHQR)
+        </h2>
+        <p class="text-xs text-zinc-500 mb-5">រូបភាពនេះនឹងបង្ហាញនៅក្នុងផ្ទាំង "បញ្ជាក់ការទូទាត់" នៅទំព័រកាបូបសម្រាប់អ្នកប្រើប្រាស់ទាំងអស់</p>
+
+        {% if payment_qr_filename %}
+        <div class="flex items-center gap-4 mb-5 p-3 bg-zinc-900/60 border border-zinc-800 rounded-lg">
+            <img src="{{ media_url('settings', payment_qr_filename) }}" alt="QR បច្ចុប្បន្ន" class="w-24 h-24 rounded-lg border border-zinc-700 bg-white object-contain p-1">
+            <div>
+                <p class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> កំពុងប្រើប្រាស់ QR នេះ</p>
+                <p class="text-[11px] text-zinc-500 mt-1">ផ្ទុកឡើងជំនួសរូបភាពខាងក្រោមដើម្បីប្តូរ</p>
+            </div>
+        </div>
+        {% else %}
+        <div class="flex items-center gap-3 mb-5 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400 text-xs">
+            <i class="fa-solid fa-triangle-exclamation"></i> មិនទាន់មាន QR ការទូទាត់ត្រូវបានកំណត់ទេ &mdash; អ្នកប្រើប្រាស់នឹងឃើញកន្លែងទំនេរ
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-zinc-400 mb-1.5">ផ្ទុករូបភាព QR ថ្មី</label>
+                <input name="payment_qr" required type="file" accept="image/*" class="w-full text-xs sm:text-sm text-zinc-300 file:mr-3 file:bg-gold file:hover:bg-gold-light file:text-black file:font-semibold file:text-xs file:px-3.5 file:py-2 file:rounded-lg file:border-0 file:cursor-pointer bg-zinc-900/90 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors cursor-pointer">
+                <p class="text-[10px] text-zinc-600 mt-1">JPG, PNG, WEBP ឬ GIF</p>
+            </div>
+            <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-sm px-6 py-2.5 rounded-lg transition">រក្សាទុក</button>
+        </form>
+    </section>
+
+    <section class="bg-cardbg border border-zinc-800 rounded-xl p-5 sm:p-6">
+        <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2 mb-1">
+            <i class="fa-solid fa-clock-rotate-left text-gold"></i> ស្កេនប្រតិបត្តិការចាស់
+        </h2>
+        <p class="text-xs text-zinc-500 mb-5">
+            ស្កេនរកសារចាស់ៗក្នុងក្រុម Telegram ដែលមិនទាន់បានចាប់យក (ឧ. សារដែលផ្ញើមុនពេល userbot ភ្ជាប់)
+            ហើយរក្សាទុកប្រតិបត្តិការណាមួយថ្មីៗ
+        </p>
+        <form method="post" action="{{ url_for('admin.backfill_telegram') }}">
+            <button type="submit" class="bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition flex items-center gap-2">
+                <i class="fa-solid fa-magnifying-glass"></i> ស្កេនឥឡូវ
+            </button>
+        </form>
+    </section>
+</main>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}{{ movie.title }} - NITEANKH{% endblock %}
+
+{% block content %}
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6">
+    <div class="min-w-0">
+
+        <!-- PLAYER -->
+        <div class="relative w-full aspect-video rounded-lg overflow-hidden bg-black shadow-lg">
+            {% if movie.has_thumbnail %}
+                <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+            {% else %}
+                <div class="absolute inset-0 bg-gradient-to-br {{ movie.bg_grad }}"></div>
+            {% endif %}
+            <div class="absolute inset-0 bg-black/30"></div>
+
+            <span class="absolute top-3 left-3 bg-gradient-to-b from-amber-400 via-yellow-500 to-amber-600 text-black px-2 py-1 rounded border border-yellow-200 shadow-lg text-[10px] font-black tracking-tighter">{{ movie.quality }}</span>
+
+            {% if vip_locked %}
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white bg-black/60">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-gold/60 flex items-center justify-center">
+                        <i class="fa-solid fa-lock text-gold text-xl sm:text-2xl"></i>
+                    </div>
+                    <p class="text-sm sm:text-base font-semibold">មាតិកា VIP ប៉ុណ្ណោះ</p>
+                    <a href="{{ url_for('membership') }}" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">ដំឡើងកម្រិត VIP</a>
+                </div>
+            {% elif guest_gate %}
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white bg-black/75 px-6 text-center">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-gold/60 flex items-center justify-center">
+                        <i class="fa-solid fa-user-lock text-gold text-xl sm:text-2xl"></i>
+                    </div>
+                    <p class="text-sm sm:text-base font-semibold">សូមចុះឈ្មោះ ដើម្បីបន្តទស្សនា</p>
+                    <p class="text-xs text-zinc-300">អ្នកបានឈានដល់កម្រិតឥតគិតថ្លៃសម្រាប់ភ្ញៀវ (2 រឿង ឬ 8 នាទី) — ចុះឈ្មោះឥតគិតថ្លៃដើម្បីមើលបន្ត</p>
+                    <a href="{{ url_for('login', next=request.path) }}" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">ចុះឈ្មោះ / ចូលប្រើ</a>
+                </div>
+            {% elif player_type == 'file' %}
+                <video id="playerVideo" controls class="absolute inset-0 w-full h-full bg-black" {% if movie.has_thumbnail %}poster="{{ media_url('thumbnails', movie.thumbnail_filename) }}"{% endif %}>
+                    <source src="{{ media_url('videos', player_value) }}">
+                </video>
+            {% elif player_type == 'embed' %}
+                <iframe src="{{ player_value }}" class="absolute inset-0 w-full h-full" allowfullscreen frameborder="0" allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+            {% else %}
+                <div class="absolute inset-0 w-full h-full flex items-center justify-center group">
+                    <span class="w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-white/10 border border-white/40 backdrop-blur-sm flex items-center justify-center">
+                        <i class="fa-solid fa-play text-white text-lg sm:text-2xl ml-1"></i>
+                    </span>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- TITLE + META -->
+        <div class="mt-4 space-y-3">
+            <h1 class="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{{ movie.title }} - {{ movie.ep_label(ep) }}</h1>
+
+            <div class="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs">
+                {% if movie.vip %}<span class="bg-gold/20 text-gold border border-gold/50 px-1.5 py-0.5 rounded font-semibold">VIP</span>{% endif %}
+                <span class="bg-zinc-800/80 text-gray-300 border border-zinc-700 px-1.5 py-0.5 rounded">{{ movie.quality }}</span>
+                <span class="flex items-center gap-1 bg-zinc-800/80 text-gray-300 border border-zinc-700 px-1.5 py-0.5 rounded">
+                    <i class="fa-solid fa-star text-gold"></i> {{ movie.rating }}
+                </span>
+                <span class="text-gray-500 dark:text-zinc-400">{{ movie.year }}</span>
+                <span class="text-gray-500 dark:text-zinc-400">&bull; {{ movie.category }}</span>
+            </div>
+
+            <div class="flex items-center gap-2 flex-wrap">
+                {% if current_user %}
+                    <form method="post" action="{{ url_for('toggle_mylist', movie_id=movie.id) }}">
+                        <button type="submit" class="flex items-center gap-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-gold/60 text-gray-700 dark:text-gray-300 text-xs px-3 py-1.5 rounded transition">
+                            <i class="fa-solid {{ 'fa-check' if in_list else 'fa-plus' }}"></i> {{ 'បានបញ្ចូល' if in_list else 'បញ្ជីរបស់ខ្ញុំ' }}
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{{ url_for('login', next=request.path) }}" class="flex items-center gap-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 hover:border-gold/60 text-gray-700 dark:text-gray-300 text-xs px-3 py-1.5 rounded transition">
+                        <i class="fa-solid fa-plus"></i> បញ្ជីរបស់ខ្ញុំ
+                    </a>
+                {% endif %}
+            </div>
+
+            <p class="text-xs sm:text-sm text-gray-600 dark:text-zinc-400 leading-relaxed">{{ movie.description }}</p>
+        </div>
+
+        <!-- EPISODES -->
+        <div class="mt-6">
+            <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+                <i class="fa-solid fa-list-ol text-gold"></i> បញ្ជីភាគ
+            </h2>
+            <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
+                {% for i in range(1, movie.total_episodes + 1) %}
+                    <a href="{{ url_for('watch', movie_id=movie.id, ep=i) }}" class="py-2 text-center rounded text-xs font-medium border transition {{ 'bg-gold text-black border-gold font-bold' if i == ep else 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-800 hover:border-gold/60' }}">
+                        {{ '%02d' % i }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR: RELATED -->
+    <aside class="min-w-0">
+        <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-clapperboard text-gold"></i> រឿងពាក់ព័ន្ធ
+        </h2>
+        <div class="space-y-3">
+            {% for m in related %}
+                <a href="{{ url_for('watch', movie_id=m.id) }}" class="flex gap-3 group cursor-pointer">
+                    <div class="relative w-28 sm:w-32 aspect-video rounded-md overflow-hidden bg-zinc-900 flex-shrink-0">
+                        {% if m.has_thumbnail %}
+                            <img src="{{ media_url('thumbnails', m.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+                        {% else %}
+                            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r {{ m.bg_grad }}">
+                                <span class="text-[10px] font-moul text-white px-1 text-center drop-shadow">{{ m.title }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-xs font-semibold text-gray-800 dark:text-gray-100 truncate group-hover:text-gold transition">{{ m.title }}</h3>
+                        <p class="text-[10px] text-gray-500 dark:text-zinc-400 mt-0.5">{{ m.category }} &bull; {{ m.total_episodes }} ភាគ</p>
+                        <p class="text-[10px] text-gray-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1">
+                            <i class="fa-solid fa-star text-gold"></i> {{ m.rating }}
+                        </p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </aside>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not current_user and player_type == 'file' and not guest_gate and not vip_locked %}
+<script>
+    (function () {
+        const video = document.getElementById('playerVideo');
+        if (!video) return;
+
+        let unreported = 0;
+        let lastTime = 0;
+
+        function reportProgress(useBeacon) {
+            if (unreported <= 0) return;
+            const seconds = Math.round(unreported);
+            unreported = 0;
+
+            const payload = JSON.stringify({ seconds });
+            if (useBeacon && navigator.sendBeacon) {
+                navigator.sendBeacon('{{ url_for("track_progress") }}', new Blob([payload], { type: 'application/json' }));
+                return;
+            }
+            fetch('{{ url_for("track_progress") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: payload,
+                keepalive: true,
+            }).then(r => r.json()).then(data => {
+                if (data.gate) {
+                    video.pause();
+                    location.reload();
+                }
+            }).catch(() => {});
+        }
+
+        video.addEventListener('timeupdate', () => {
+            if (!video.paused && !video.seeking) {
+                const delta = video.currentTime - lastTime;
+                if (delta > 0 && delta < 2) unreported += delta; // ignore seeks/jumps
+            }
+            lastTime = video.currentTime;
+            if (unreported >= 10) reportProgress(false);
+        });
+
+        video.addEventListener('pause', () => reportProgress(false));
+        window.addEventListener('beforeunload', () => reportProgress(true));
+    })();
+</script>
+{% endif %}
+{% endblock %}

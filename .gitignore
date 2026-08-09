@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+niteankh.db
+.env
+static/uploads/

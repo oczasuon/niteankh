@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="km" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NITEANKH Admin{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;500;600;700&family=Moul&display=swap">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { colors: { gold: { DEFAULT: '#C59B27', light: '#E2B842', dark: '#A37E1C' }, darkbg: '#0A0A0A', cardbg: '#141414' }, fontFamily: { sans: ['Kantumruy Pro', 'sans-serif'] } } }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-darkbg text-gray-200 font-sans min-h-screen">
+
+    <header class="border-b border-zinc-800 bg-black/60">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center gap-3 justify-between">
+            <div class="flex items-center gap-2">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="NITEANKH" class="w-8 h-8 rounded-full object-cover border border-gold/60">
+                <span class="font-bold text-sm text-white tracking-wide">NITEAN<span class="text-gold">KH</span> <span class="text-zinc-500 font-normal">Admin</span></span>
+            </div>
+
+            <nav class="flex items-center gap-4 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar">
+                {% set tabs = [
+                    (url_for('admin.dashboard'), 'ផ្ទាំងគ្រប់គ្រង'),
+                    (url_for('admin.upload'), 'បង្ហោះខ្លឹមសារ'),
+                    (url_for('admin.manage'), 'គ្រប់គ្រងខ្លឹមសារ'),
+                    (url_for('admin.categories'), 'ប្រភេទ'),
+                    (url_for('admin.reports'), 'របាយការណ៍'),
+                    (url_for('admin.settings'), 'ការកំណត់'),
+                ] %}
+                {% for href, label in tabs %}
+                    <a href="{{ href }}" class="whitespace-nowrap transition {{ 'text-gold' if request.path == href else 'text-zinc-400 hover:text-gold' }}">{{ label }}</a>
+                {% endfor %}
+            </nav>
+
+            <div class="flex items-center gap-3 text-xs sm:text-sm">
+                <a href="{{ url_for('index') }}" class="text-zinc-400 hover:text-gold transition"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>មើលគេហទំព័រ</a>
+                <a href="{{ url_for('admin.logout') }}" class="text-red-400 hover:text-red-300 transition"><i class="fa-solid fa-right-from-bracket mr-1"></i>ចាកចេញ</a>
+            </div>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-4 space-y-2">
+                {% for category, msg in messages %}
+                    <div class="text-xs sm:text-sm px-4 py-2 rounded-lg {{ 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' if category == 'success' else 'bg-red-500/10 text-red-400 border border-red-500/30' }}">{{ msg }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

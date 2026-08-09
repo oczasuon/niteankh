@@ -1,0 +1,118 @@
+{% extends 'admin/base.html' %}
+{% block title %}របាយការណ៍ - NITEANKH Admin{% endblock %}
+
+{% block content %}
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-10">
+    <div>
+        <h1 class="text-lg sm:text-xl font-bold text-white">របាយការណ៍</h1>
+        <p class="text-xs sm:text-sm text-zinc-500 mt-1">សង្ខេបអ្នកប្រើប្រាស់ ខ្លឹមសារ និងលំហូរសាច់ប្រាក់</p>
+    </div>
+
+    <div>
+        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-3">ទិដ្ឋភាពទូទៅ</h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
+                <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-users text-gold"></i> អ្នកប្រើប្រាស់សរុប</p>
+                <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ total_users }}</p>
+            </div>
+            <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
+                <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-film text-gold"></i> ខ្លឹមសារសរុប</p>
+                <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ total_movies }}</p>
+            </div>
+            <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
+                <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-coins text-gold"></i> សមតុល្យសរុបបច្ចុប្បន្ន</p>
+                <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ '{:,}'.format(total_balance) }}</p>
+            </div>
+            <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
+                <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-crown text-gold"></i> សមាជិក VIP សកម្ម</p>
+                <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ active_vip }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-3">លំហូរសាច់ប្រាក់ (គិតជាកាក់)</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div class="bg-cardbg border border-emerald-500/30 rounded-xl p-4">
+                <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-arrow-down text-emerald-500"></i> សរុបបញ្ចូលកាបូប (Top-up + កូដ)</p>
+                <p class="text-xl sm:text-2xl font-bold text-emerald-400 mt-1.5">{{ '{:,}'.format(total_topped_up) }}</p>
+            </div>
+            <div class="bg-cardbg border border-gold/30 rounded-xl p-4">
+                <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-arrow-up text-gold"></i> សរុបចំណាយទិញ VIP / មាតិកា</p>
+                <p class="text-xl sm:text-2xl font-bold text-gold mt-1.5">{{ '{:,}'.format(total_spent) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wide">អ្នកប្រើប្រាស់ តាមគណនី</h2>
+            <span class="text-[11px] text-zinc-500">{{ rows|length }} គណនី</span>
+        </div>
+        <div class="bg-cardbg border border-zinc-800 rounded-xl overflow-hidden">
+            {% if rows %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs sm:text-sm">
+                    <thead>
+                        <tr class="bg-zinc-900/60 text-left text-zinc-400">
+                            <th class="px-4 py-3 font-semibold">អ្នកប្រើប្រាស់</th>
+                            <th class="px-4 py-3 font-semibold hidden sm:table-cell">ចូលរួមនៅ</th>
+                            <th class="px-4 py-3 font-semibold text-right">សមតុល្យ</th>
+                            <th class="px-4 py-3 font-semibold text-right hidden md:table-cell">សរុបបញ្ចូល</th>
+                            <th class="px-4 py-3 font-semibold text-right hidden md:table-cell">សរុបចំណាយ</th>
+                            <th class="px-4 py-3 font-semibold">VIP</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800">
+                        {% for row in rows %}{% set user = row.user %}
+                        <tr class="hover:bg-zinc-900/40 transition">
+                            <td class="px-4 py-3">
+                                <p class="font-medium text-white">{{ user.name }}</p>
+                                <p class="text-[11px] text-zinc-500">{{ user.email }}</p>
+                            </td>
+                            <td class="px-4 py-3 text-zinc-400 hidden sm:table-cell">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-4 py-3 text-right font-semibold text-white">{{ '{:,}'.format(user.balance) }}</td>
+                            <td class="px-4 py-3 text-right text-emerald-400 hidden md:table-cell">+{{ '{:,}'.format(row.topped_up) }}</td>
+                            <td class="px-4 py-3 text-right text-gold hidden md:table-cell">{{ '{:,}'.format(row.spent) }}</td>
+                            <td class="px-4 py-3">
+                                {% if user.is_vip_active %}
+                                    <span class="bg-gold/20 text-gold border border-gold/40 text-[10px] font-bold px-2 py-0.5 rounded-full">{{ user.vip_days_left }}d</span>
+                                {% else %}
+                                    <span class="bg-zinc-800 text-zinc-500 text-[10px] font-bold px-2 py-0.5 rounded-full">&mdash;</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="flex flex-col items-center justify-center text-center py-14 gap-2">
+                <i class="fa-solid fa-users text-zinc-600 text-xl"></i>
+                <p class="text-sm text-zinc-500">មិនទាន់មានអ្នកប្រើប្រាស់ចុះឈ្មោះនៅឡើយទេ</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-3">ខ្លឹមសារតាមប្រភេទ</h2>
+        <div class="bg-cardbg border border-zinc-800 rounded-xl p-4 sm:p-5">
+            <div class="flex flex-wrap gap-3 text-xs mb-4">
+                <span class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5">ខ្លឹមសារកសាងស្រាប់ (Seeded): <span class="font-bold text-white">{{ seeded_count }}</span></span>
+                <span class="bg-gold/10 border border-gold/30 rounded-lg px-3 py-1.5 text-gold">បង្ហោះដោយ Admin: <span class="font-bold">{{ admin_uploads }}</span></span>
+                <span class="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5">VIP: <span class="font-bold text-white">{{ vip_movie_count }}</span></span>
+            </div>
+            <div class="space-y-2.5">
+                {% for cat, count, pct in category_counts %}
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-zinc-400 w-28 flex-shrink-0 truncate">{{ cat }}</span>
+                    <div class="flex-1 h-2 bg-zinc-900 rounded-full overflow-hidden"><div class="h-full bg-gold rounded-full" style="width:{{ pct }}%"></div></div>
+                    <span class="text-xs text-zinc-300 w-8 text-right flex-shrink-0">{{ count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

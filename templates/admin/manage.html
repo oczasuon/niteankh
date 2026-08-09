@@ -1,0 +1,94 @@
+{% extends 'admin/base.html' %}
+{% block title %}គ្រប់គ្រងខ្លឹមសារ - NITEANKH Admin{% endblock %}
+
+{% block extra_head %}
+<style>.filter-btn.active { background-color: #C59B27; color: #000; }</style>
+{% endblock %}
+
+{% block content %}
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-lg sm:text-xl font-bold text-white">គ្រប់គ្រងខ្លឹមសារ</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 mt-1">សរុប {{ pagination.total }} ខ្លឹមសារ</p>
+        </div>
+        <a href="{{ url_for('admin.upload') }}" class="flex items-center gap-2 bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2 rounded-lg transition"><i class="fa-solid fa-plus"></i> បង្ហោះថ្មី</a>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-lg p-1 text-xs font-semibold">
+            <a href="{{ url_for('admin.manage', source='all', q=q) }}" class="filter-btn {{ 'active' if source == 'all' }} px-3 py-1.5 rounded-md text-zinc-400 transition inline-block">ទាំងអស់</a>
+            <a href="{{ url_for('admin.manage', source='admin', q=q) }}" class="filter-btn {{ 'active' if source == 'admin' }} px-3 py-1.5 rounded-md text-zinc-400 transition inline-block">បង្ហោះដោយ Admin</a>
+        </div>
+        <form method="get" class="flex-1 min-w-[180px]">
+            <input type="hidden" name="source" value="{{ source }}">
+            <input name="q" value="{{ q }}" type="text" placeholder="ស្វែងរកតាមចំណងជើង..." class="w-full bg-zinc-900/90 text-xs sm:text-sm text-gray-200 rounded-lg px-3.5 py-2 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+        </form>
+    </div>
+
+    <div class="bg-cardbg border border-zinc-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs sm:text-sm">
+                <thead>
+                    <tr class="bg-zinc-900/60 text-left text-zinc-400">
+                        <th class="px-4 py-3 font-semibold">ខ្លឹមសារ</th>
+                        <th class="px-4 py-3 font-semibold hidden sm:table-cell">ប្រភេទ</th>
+                        <th class="px-4 py-3 font-semibold hidden md:table-cell">ភាគ</th>
+                        <th class="px-4 py-3 font-semibold">ប្រភព</th>
+                        <th class="px-4 py-3 font-semibold text-right">សកម្មភាព</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-800">
+                    {% for movie in movies %}
+                    <tr class="hover:bg-zinc-900/40 transition">
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                <div class="relative w-16 sm:w-20 aspect-video rounded-md overflow-hidden bg-zinc-900 flex-shrink-0">
+                                    {% if movie.has_thumbnail %}
+                                        <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+                                    {% else %}
+                                        <div class="absolute inset-0 bg-gradient-to-r {{ movie.bg_grad }}"></div>
+                                    {% endif %}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-medium text-white truncate max-w-[160px] sm:max-w-[220px]">{{ movie.title }}</p>
+                                    <p class="text-[11px] text-zinc-500 sm:hidden">{{ movie.category }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-zinc-400 hidden sm:table-cell">{{ movie.category }}</td>
+                        <td class="px-4 py-3 text-zinc-400 hidden md:table-cell">{{ movie.total_episodes }} ភាគ</td>
+                        <td class="px-4 py-3">
+                            {% if movie.is_admin_upload %}
+                                <span class="bg-gold/20 text-gold border border-gold/40 text-[10px] font-bold px-2 py-0.5 rounded-full">Admin</span>
+                            {% else %}
+                                <span class="bg-zinc-800 text-zinc-400 text-[10px] font-bold px-2 py-0.5 rounded-full">Seeded</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                            <a href="{{ url_for('watch', movie_id=movie.id) }}" target="_blank" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="មើល"><i class="fa-solid fa-eye"></i></a>
+                            {% if movie.is_admin_upload %}
+                                <a href="{{ url_for('admin.upload', movie_id=movie.id) }}" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="កែសម្រួល"><i class="fa-solid fa-pen"></i></a>
+                                <form method="post" action="{{ url_for('admin.delete_movie', movie_id=movie.id) }}" class="inline" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់លុប &quot;{{ movie.title }}&quot; មែនទេ?')">
+                                    <button type="submit" class="text-zinc-400 hover:text-red-500 transition inline-block px-1.5" title="លុប"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            {% else %}
+                                <span class="text-zinc-700 inline-block px-1.5" title="ខ្លឹមសារកសាងស្រាប់ មិនអាចកែបានទេ"><i class="fa-solid fa-lock"></i></span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if not movies %}
+        <div class="flex flex-col items-center justify-center text-center py-14 gap-2">
+            <i class="fa-solid fa-inbox text-zinc-600 text-xl"></i>
+            <p class="text-sm text-zinc-500">មិនមានខ្លឹមសារត្រូវនឹងលក្ខខណ្ឌនេះទេ</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% include '_pagination.html' %}
+</main>
+{% endblock %}

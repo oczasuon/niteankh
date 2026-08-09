@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block title %}កាបូប - NITEANKH{% endblock %}
+
+{% block extra_head %}
+<style>
+    .pkg-radio:checked + label { border-color: #C59B27; box-shadow: 0 0 0 2px rgba(197, 155, 39, 0.35); }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <section class="bg-gradient-to-br from-zinc-900 via-black to-zinc-900 border border-gold/30 rounded-xl p-5 sm:p-6 relative overflow-hidden">
+        <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-gold/10 blur-2xl"></div>
+        <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <p class="text-xs text-zinc-400 flex items-center gap-1.5"><i class="fa-solid fa-wallet text-gold"></i> សមតុល្យកាបូបរបស់អ្នក</p>
+                <p class="text-2xl sm:text-3xl font-bold text-white mt-1">{{ '{:,}'.format(current_user.balance) }} <span class="text-gold text-base font-semibold">កាក់</span></p>
+                <p class="text-[11px] sm:text-xs text-zinc-400 mt-2 flex items-center gap-1.5">
+                    {% if current_user.is_vip_active %}
+                        <i class="fa-solid fa-crown text-gold"></i> សមាជិក VIP &mdash; នៅសល់ {{ current_user.vip_days_left }} ថ្ងៃទៀត
+                    {% else %}
+                        <i class="fa-regular fa-star text-zinc-500"></i> សមាជិកទូទៅ &mdash; មិនទាន់មានសិទ្ធិ VIP
+                    {% endif %}
+                </p>
+            </div>
+            <a href="#topup" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2 rounded flex items-center gap-2 transition w-fit"><i class="fa-solid fa-plus"></i> បញ្ចូលកាបូប</a>
+        </div>
+    </section>
+
+    <section id="topup">
+        <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3"><i class="fa-solid fa-coins text-gold"></i> កញ្ចប់បញ្ចូលកាបូប</h2>
+        <form id="topupForm" method="post" action="{{ url_for('wallet_topup') }}">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {% for pkg in packages %}
+                <div>
+                    <input type="radio" name="package" value="{{ loop.index0 }}" id="pkg{{ loop.index0 }}" data-coins="{{ '{:,}'.format(pkg.coins) }}" data-price="{{ pkg.price }}" class="pkg-radio hidden" {{ 'checked' if loop.first }}>
+                    <label for="pkg{{ loop.index0 }}" class="cursor-pointer block text-left bg-white dark:bg-cardbg border-2 border-gray-200 dark:border-zinc-800 rounded-lg p-3 transition">
+                        <p class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-1.5"><i class="fa-solid fa-coins text-gold text-xs"></i> {{ '{:,}'.format(pkg.coins) }}</p>
+                        <p class="text-[11px] sm:text-xs text-gray-500 dark:text-zinc-400 mt-1">{{ pkg.price }}</p>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            <button type="button" onclick="openPaymentModal()" class="mt-5 bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-6 py-2.5 rounded transition">បញ្ជាក់ការទូទាត់</button>
+        </form>
+    </section>
+
+    <!-- PAYMENT QR MODAL -->
+    <div id="paymentModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="relative w-full max-w-sm bg-white dark:bg-cardbg border border-gray-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-zinc-800">
+                <p class="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2"><i class="fa-solid fa-qrcode text-gold"></i> ស្កេន QR ដើម្បីទូទាត់</p>
+                <button type="button" onclick="closePaymentModal()" class="text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+                <div class="text-center">
+                    <p id="modalPkgSummary" class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-3"></p>
+                    {% if payment_qr_filename %}
+                        <img src="{{ media_url('settings', payment_qr_filename) }}" alt="KHQR Payment" class="w-48 h-48 mx-auto rounded-lg border border-gray-200 dark:border-zinc-700 object-contain bg-white p-2">
+                        <p class="text-[11px] text-gray-400 dark:text-zinc-500 mt-2">ស្កេនតាមកម្មវិធីធនាគាររបស់អ្នក រួចបំពេញព័ត៌មានខាងក្រោមសម្រាប់ការត្រួតពិនិត្យ</p>
+                    {% else %}
+                        <div class="w-48 h-48 mx-auto rounded-lg border border-dashed border-gray-300 dark:border-zinc-700 flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-zinc-500">
+                            <i class="fa-solid fa-qrcode text-2xl"></i>
+                            <span class="text-[10px] px-4 text-center">Admin មិនទាន់បានកំណត់ QR ការទូទាត់ទេ</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ឈ្មោះគណនីធនាគារ (អ្នកផ្ទេរ) *</label>
+                    <input form="topupForm" name="bank_name" required type="text" placeholder="ឧ. SUON OCZA" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">លេខយោង / Hash ពីធនាគារ *</label>
+                    <input form="topupForm" name="bank_ref" required type="text" placeholder="ឧ. FT2408091234567" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                </div>
+                <button type="submit" form="topupForm" class="w-full bg-gold hover:bg-gold-light text-black font-semibold text-sm py-2.5 rounded-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check"></i> ខ្ញុំបានទូទាត់រួចរាល់
+                </button>
+                <p class="text-[10px] text-gray-400 dark:text-zinc-500 text-center">សូមរក្សាទុករូបថតបញ្ជាក់ការទូទាត់ ក្នុងករណីត្រូវការផ្ទៀងផ្ទាត់</p>
+            </div>
+        </div>
+    </div>
+
+    <section id="vip">
+        <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3"><i class="fa-solid fa-crown text-gold"></i> សមាជិកភាព VIP</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {% for plan in vip_plans %}
+            <div class="bg-white dark:bg-cardbg border border-gray-200 dark:border-zinc-800 rounded-lg p-4 flex flex-col items-center text-center gap-2 relative">
+                {% if plan.tag %}<span class="absolute -top-2.5 bg-gold text-black text-[9px] font-bold px-2 py-0.5 rounded-full">{{ plan.tag }}</span>{% endif %}
+                <i class="fa-solid fa-crown text-gold text-xl"></i>
+                <p class="text-sm sm:text-base font-bold text-gray-900 dark:text-white">{{ plan.label }}</p>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 flex items-center gap-1"><i class="fa-solid fa-coins text-gold"></i> {{ '{:,}'.format(plan.cost) }} កាក់</p>
+                <form method="post" action="{{ url_for('wallet_buy_vip') }}" class="w-full">
+                    <input type="hidden" name="plan" value="{{ loop.index0 }}">
+                    <button type="submit" class="w-full mt-1 bg-gold hover:bg-gold-light text-black font-semibold text-xs px-3 py-1.5 rounded transition">ទិញឥឡូវ</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section>
+        <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3"><i class="fa-solid fa-ticket text-gold"></i> កូដពិសេស</h2>
+        <form method="post" action="{{ url_for('wallet_redeem') }}" class="flex gap-2 max-w-md">
+            <input name="code" type="text" placeholder="បញ្ចូលកូដ..." class="flex-1 bg-gray-100 dark:bg-zinc-900/90 text-xs sm:text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors uppercase">
+            <button type="submit" class="bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 hover:border-gold text-gray-800 dark:text-gray-200 font-semibold text-xs sm:text-sm px-4 py-2 rounded transition">ប្រើកូដ</button>
+        </form>
+    </section>
+
+    <section>
+        <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3"><i class="fa-solid fa-receipt text-gold"></i> ប្រវត្តិប្រតិបត្តិការ</h2>
+        {% if tx %}
+        <div class="space-y-2">
+            {% for item in tx %}
+            <div class="flex items-center gap-3 bg-white dark:bg-cardbg border border-gray-200 dark:border-zinc-800 rounded-lg p-3">
+                <div class="w-9 h-9 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid {{ 'fa-crown' if item.type == 'vip' else 'fa-plus' }} {{ 'text-gold' if item.type == 'vip' else 'text-emerald-500' }} text-xs"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs sm:text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{{ item.desc }}</p>
+                    {% if item.bank_name or item.bank_ref %}
+                        <p class="text-[10px] text-gray-500 dark:text-zinc-500 mt-0.5">{{ item.bank_name }} {{ '&bull; Ref: ' ~ item.bank_ref if item.bank_ref }}</p>
+                    {% endif %}
+                    <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+                <p class="text-xs sm:text-sm font-bold {{ 'text-emerald-500' if item.amount >= 0 else 'text-red-500' }} flex-shrink-0">{{ '+' if item.amount >= 0 }}{{ '{:,}'.format(item.amount) }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="flex flex-col items-center justify-center text-center py-14 gap-3">
+            <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-zinc-900 flex items-center justify-center border border-gray-200 dark:border-zinc-800"><i class="fa-solid fa-receipt text-gray-400 dark:text-zinc-500"></i></div>
+            <p class="text-sm text-gray-600 dark:text-zinc-400">មិនទាន់មានប្រតិបត្តិការទេ</p>
+        </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function openPaymentModal() {
+        const checked = document.querySelector('input[name="package"]:checked');
+        if (checked) {
+            document.getElementById('modalPkgSummary').textContent =
+                `កញ្ចប់ដែលបានជ្រើសរើស៖ ${checked.dataset.coins} កាក់ (${checked.dataset.price})`;
+        }
+        document.getElementById('paymentModal').classList.remove('hidden');
+    }
+
+    function closePaymentModal() {
+        document.getElementById('paymentModal').classList.add('hidden');
+    }
+
+    document.getElementById('paymentModal').addEventListener('click', (e) => {
+        if (e.target.id === 'paymentModal') closePaymentModal();
+    });
+</script>
+{% endblock %}
