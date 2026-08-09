@@ -4,7 +4,7 @@
 {% block content %}
 <!-- HERO AUTO-PLAY SLIDER -->
 <section class="relative w-full bg-black overflow-hidden">
-    <div id="heroSlider" class="relative h-[260px] sm:h-[380px] md:h-[480px] lg:h-[520px] w-full">
+    <div id="heroSlider" class="relative h-[260px] sm:h-[380px] md:h-auto md:aspect-[8/3] w-full">
         {% for movie in hero_movies %}
         <div class="hero-slide absolute inset-0 transition-opacity duration-700 {{ 'opacity-100 z-10' if loop.first else 'opacity-0 pointer-events-none' }}">
             {% if movie.has_slide_image %}
