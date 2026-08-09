@@ -79,12 +79,6 @@ def run():
             db.session.add(admin)
             print('Created admin account: admin@niteankh.local / admin123')
 
-        if not User.query.filter_by(email='demo@niteankh.local').first():
-            demo = User(name='អ្នកប្រើប្រាស់សាកល្បង', email='demo@niteankh.local', balance=1000)
-            demo.set_password('demo1234')
-            db.session.add(demo)
-            print('Created demo account: demo@niteankh.local / demo1234 (1000 coins)')
-
         db.session.commit()
 
 
