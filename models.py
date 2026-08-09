@@ -11,11 +11,16 @@ def now():
 
 
 class User(db.Model):
+    ROLE_CLIENT = 'client'
+    ROLE_POSTER = 'poster'
+    ROLE_ADMIN = 'admin'
+    STAFF_ROLES = (ROLE_ADMIN, ROLE_POSTER)
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(180), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    role = db.Column(db.String(20), default=ROLE_CLIENT, nullable=False)
     balance = db.Column(db.Integer, default=0, nullable=False)
     vip_expiry = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=now)
@@ -25,6 +30,14 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @property
+    def is_admin(self):
+        return self.role == User.ROLE_ADMIN
+
+    @property
+    def is_staff(self):
+        return self.role in User.STAFF_ROLES
 
     @property
     def is_vip_active(self):

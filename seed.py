@@ -74,7 +74,7 @@ def run():
             print('Movies already seeded, skipping.')
 
         if not User.query.filter_by(email='admin@niteankh.local').first():
-            admin = User(name='Admin', email='admin@niteankh.local', is_admin=True)
+            admin = User(name='Admin', email='admin@niteankh.local', role=User.ROLE_ADMIN)
             admin.set_password('admin123')
             db.session.add(admin)
             print('Created admin account: admin@niteankh.local / admin123')

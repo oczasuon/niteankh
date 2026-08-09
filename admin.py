@@ -4,7 +4,7 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 
 import storage
 import telegram_userbot
-from helpers import admin_required, get_categories, get_current_user, get_setting, set_setting, to_embeddable_url
+from helpers import admin_required, get_categories, get_current_user, get_setting, set_setting, staff_required, to_embeddable_url
 from models import Category, Episode, Movie, User, WalletTransaction, db
 
 admin_bp = Blueprint('admin', __name__)
@@ -15,9 +15,11 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
-        user = User.query.filter_by(email=email, is_admin=True).first()
-        if user and user.check_password(password):
+        user = User.query.filter_by(email=email).first()
+        if user and user.is_staff and user.check_password(password):
             session['user_id'] = user.id
+            if user.role == User.ROLE_POSTER:
+                return redirect(url_for('admin.upload'))
             return redirect(url_for('admin.dashboard'))
         flash('ព័ត៌មានចូលប្រើមិនត្រឹមត្រូវ', 'error')
     return render_template('admin/login.html')
@@ -42,7 +44,7 @@ def dashboard():
 
 @admin_bp.route('/upload', methods=['GET', 'POST'], defaults={'movie_id': None})
 @admin_bp.route('/upload/<int:movie_id>', methods=['GET', 'POST'])
-@admin_required
+@staff_required
 def upload(movie_id):
     movie = Movie.query.get_or_404(movie_id) if movie_id else None
     if movie and not movie.is_admin_upload:
@@ -144,7 +146,7 @@ def upload(movie_id):
 
 
 @admin_bp.post('/upload/<int:movie_id>/episode/<int:ep_num>')
-@admin_required
+@staff_required
 def upload_episode(movie_id, ep_num):
     movie = Movie.query.get_or_404(movie_id)
     if not movie.is_admin_upload:
@@ -186,7 +188,7 @@ def upload_episode(movie_id, ep_num):
 
 
 @admin_bp.post('/upload/<int:movie_id>/episode/<int:ep_num>/delete')
-@admin_required
+@staff_required
 def delete_episode_video(movie_id, ep_num):
     episode = Episode.query.filter_by(movie_id=movie_id, episode_num=ep_num).first()
     if episode:
@@ -236,7 +238,7 @@ def delete_movie(movie_id):
 @admin_bp.route('/reports')
 @admin_required
 def reports():
-    users = User.query.filter_by(is_admin=False).order_by(User.created_at.desc()).all()
+    users = User.query.filter_by(role=User.ROLE_CLIENT).order_by(User.created_at.desc()).all()
 
     rows = []
     total_balance = 0
@@ -361,3 +363,84 @@ def backfill_telegram():
     else:
         flash('មិនមានប្រតិបត្តិការចាស់ថ្មីត្រូវរកឃើញទេ (ឬមុខងារ Telegram userbot មិនទាន់បានកំណត់)', 'error')
     return redirect(url_for('admin.settings'))
+
+
+@admin_bp.route('/users')
+@admin_required
+def users():
+    q = request.args.get('q', '').strip()
+    page = request.args.get('page', 1, type=int)
+
+    client_query = User.query.filter_by(role=User.ROLE_CLIENT)
+    if q:
+        client_query = client_query.filter(
+            db.or_(User.name.ilike(f'%{q}%'), User.email.ilike(f'%{q}%'))
+        )
+    pagination = client_query.order_by(User.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
+
+    staff = User.query.filter(User.role.in_(User.STAFF_ROLES)).order_by(User.role, User.created_at).all()
+
+    return render_template(
+        'admin/users.html', clients=pagination.items, pagination=pagination, q=q,
+        staff=staff, total_clients=User.query.filter_by(role=User.ROLE_CLIENT).count(),
+    )
+
+
+@admin_bp.post('/users/staff/add')
+@admin_required
+def add_staff():
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+    role = request.form.get('role', '')
+
+    if role not in User.STAFF_ROLES:
+        flash('សូមជ្រើសរើសតួនាទីត្រឹមត្រូវ', 'error')
+    elif not name or not email or len(password) < 6:
+        flash('សូមបំពេញឈ្មោះ អ៊ីមែល និងពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)', 'error')
+    elif User.query.filter_by(email=email).first():
+        flash('អ៊ីមែលនេះមានគណនីរួចហើយ', 'error')
+    else:
+        staff_user = User(name=name, email=email, role=role)
+        staff_user.set_password(password)
+        db.session.add(staff_user)
+        db.session.commit()
+        flash('បានបន្ថែមគណនីបុគ្គលិកថ្មីរួចរាល់', 'success')
+    return redirect(url_for('admin.users'))
+
+
+@admin_bp.post('/users/staff/<int:user_id>/role')
+@admin_required
+def change_staff_role(user_id):
+    target = User.query.get_or_404(user_id)
+    new_role = request.form.get('role', '')
+    current = get_current_user()
+
+    if target.id == current.id:
+        flash('អ្នកមិនអាចផ្លាស់ប្តូរតួនាទីគណនីខ្លួនឯងបានទេ', 'error')
+    elif target.role not in User.STAFF_ROLES:
+        flash('គណនីនេះមិនមែនជាបុគ្គលិកទេ', 'error')
+    elif new_role not in User.STAFF_ROLES:
+        flash('សូមជ្រើសរើសតួនាទីត្រឹមត្រូវ', 'error')
+    else:
+        target.role = new_role
+        db.session.commit()
+        flash('បានប្តូរតួនាទីរួចរាល់', 'success')
+    return redirect(url_for('admin.users'))
+
+
+@admin_bp.post('/users/staff/<int:user_id>/delete')
+@admin_required
+def delete_staff(user_id):
+    target = User.query.get_or_404(user_id)
+    current = get_current_user()
+
+    if target.id == current.id:
+        flash('អ្នកមិនអាចលុបគណនីខ្លួនឯងបានទេ', 'error')
+    elif target.role not in User.STAFF_ROLES:
+        flash('គណនីនេះមិនមែនជាបុគ្គលិកទេ', 'error')
+    else:
+        target.role = User.ROLE_CLIENT
+        db.session.commit()
+        flash('បានដកសិទ្ធិបុគ្គលិករួចរាល់ (គណនីប្រែជាអតិថិជនធម្មតា)', 'success')
+    return redirect(url_for('admin.users'))

@@ -33,14 +33,21 @@
             </div>
 
             <nav class="flex items-center gap-4 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar">
-                {% set tabs = [
-                    (url_for('admin.dashboard'), 'ផ្ទាំងគ្រប់គ្រង'),
-                    (url_for('admin.upload'), 'បង្ហោះខ្លឹមសារ'),
-                    (url_for('admin.manage'), 'គ្រប់គ្រងខ្លឹមសារ'),
-                    (url_for('admin.categories'), 'ប្រភេទ'),
-                    (url_for('admin.reports'), 'របាយការណ៍'),
-                    (url_for('admin.settings'), 'ការកំណត់'),
-                ] %}
+                {% if current_user and current_user.is_admin %}
+                    {% set tabs = [
+                        (url_for('admin.dashboard'), 'ផ្ទាំងគ្រប់គ្រង'),
+                        (url_for('admin.upload'), 'បង្ហោះខ្លឹមសារ'),
+                        (url_for('admin.manage'), 'គ្រប់គ្រងខ្លឹមសារ'),
+                        (url_for('admin.categories'), 'ប្រភេទ'),
+                        (url_for('admin.users'), 'អ្នកប្រើប្រាស់'),
+                        (url_for('admin.reports'), 'របាយការណ៍'),
+                        (url_for('admin.settings'), 'ការកំណត់'),
+                    ] %}
+                {% else %}
+                    {% set tabs = [
+                        (url_for('admin.upload'), 'បង្ហោះខ្លឹមសារ'),
+                    ] %}
+                {% endif %}
                 {% for href, label in tabs %}
                     <a href="{{ href }}" class="whitespace-nowrap transition {{ 'text-gold' if request.path == href else 'text-zinc-400 hover:text-gold' }}">{{ label }}</a>
                 {% endfor %}

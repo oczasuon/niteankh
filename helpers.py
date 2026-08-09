@@ -2,7 +2,7 @@ import re
 from functools import wraps
 from urllib.parse import parse_qs, urlparse
 
-from flask import redirect, request, session, url_for
+from flask import flash, redirect, request, session, url_for
 
 from models import Category, Setting, User, db
 
@@ -137,10 +137,27 @@ def login_required(view):
 
 
 def admin_required(view):
+    """Full-admin-only routes. A logged-in poster gets bounced to their one
+    permitted page (upload) with a message, instead of back to the login
+    screen, since they are authenticated — just not permitted here."""
     @wraps(view)
     def wrapped(*args, **kwargs):
         user = get_current_user()
-        if not user or not user.is_admin:
+        if not user or not user.is_staff:
+            return redirect(url_for('admin.login'))
+        if not user.is_admin:
+            flash('អ្នកមិនមានសិទ្ធិចូលប្រើផ្នែកនេះទេ', 'error')
+            return redirect(url_for('admin.upload'))
+        return view(*args, **kwargs)
+    return wrapped
+
+
+def staff_required(view):
+    """Posting routes only — both full admins and posters may access these."""
+    @wraps(view)
+    def wrapped(*args, **kwargs):
+        user = get_current_user()
+        if not user or not user.is_staff:
             return redirect(url_for('admin.login'))
         return view(*args, **kwargs)
     return wrapped

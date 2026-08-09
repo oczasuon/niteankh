@@ -147,7 +147,7 @@
 
         <div class="flex items-center gap-3 pt-2">
             <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-sm px-6 py-2.5 rounded-lg transition">{{ 'រក្សាទុកការផ្លាស់ប្តូរ' if movie else 'បង្ហោះខ្លឹមសារ' }}</button>
-            <a href="{{ url_for('admin.manage') }}" class="text-xs text-zinc-400 hover:text-gold transition">បោះបង់</a>
+            <a href="{{ url_for('admin.manage') if current_user.is_admin else url_for('admin.upload') }}" class="text-xs text-zinc-400 hover:text-gold transition">បោះបង់</a>
         </div>
     </form>
 
@@ -156,7 +156,9 @@
         <p class="text-xs sm:text-sm text-emerald-400 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> កំពុងកែសម្រួល "{{ movie.title }}"</p>
         <div class="flex gap-3 text-xs font-semibold">
             <a href="{{ url_for('watch', movie_id=movie.id) }}" target="_blank" class="text-gold hover:underline">មើលនៅគេហទំព័រ &rarr;</a>
+            {% if current_user.is_admin %}
             <a href="{{ url_for('admin.manage') }}" class="text-zinc-300 hover:underline">គ្រប់គ្រងខ្លឹមសារ &rarr;</a>
+            {% endif %}
         </div>
     </div>
 
