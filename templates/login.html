@@ -53,9 +53,9 @@
         </div>
 
         <div class="space-y-2.5">
-            <button type="button" onclick="alert('ការចូលប្រើតាម Google កំពុងអភិវឌ្ឍនៅឡើយ')" class="w-full flex items-center justify-center gap-2.5 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 hover:border-gold/60 text-gray-700 dark:text-gray-200 text-sm font-medium py-2.5 rounded-lg transition">
+            <a href="{{ url_for('login_google', next=request.args.get('next', '')) }}" class="w-full flex items-center justify-center gap-2.5 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 hover:border-gold/60 text-gray-700 dark:text-gray-200 text-sm font-medium py-2.5 rounded-lg transition">
                 <i class="fa-brands fa-google text-red-500"></i> ចូលប្រើដោយ Google
-            </button>
+            </a>
             <button type="button" onclick="alert('ការចូលប្រើតាម Telegram កំពុងអភិវឌ្ឍនៅឡើយ')" class="w-full flex items-center justify-center gap-2.5 bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 hover:border-gold/60 text-gray-700 dark:text-gray-200 text-sm font-medium py-2.5 rounded-lg transition">
                 <i class="fa-brands fa-telegram text-sky-500"></i> ចូលប្រើដោយ Telegram
             </button>

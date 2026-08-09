@@ -27,6 +27,7 @@ class User(db.Model):
     sex = db.Column(db.String(10), nullable=True)  # 'male' | 'female' | 'other'
     dob = db.Column(db.Date, nullable=True)
     location = db.Column(db.String(255), nullable=True)
+    google_id = db.Column(db.String(64), unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=now)
 
     def set_password(self, password):

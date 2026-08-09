@@ -1,8 +1,11 @@
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 
+from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
@@ -18,6 +21,7 @@ from helpers import (
 from models import BankTransaction, Episode, HistoryItem, Movie, MyListItem, User, WalletTransaction, db
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+oauth = OAuth()
 
 
 def get_database_uri():
@@ -36,6 +40,10 @@ def create_app(start_services=True):
     starting the background poller, so running a quick script doesn't spin up
     a second concurrent connection alongside an already-running server."""
     app = Flask(__name__)
+    # Trusts X-Forwarded-Proto/Host from the reverse proxy (Cloudflare) in front
+    # of the Pi, so url_for(..., _external=True) generates https:// URLs — the
+    # app itself is only ever reached over plain HTTP from the tunnel.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-change-me')
     app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -44,6 +52,19 @@ def create_app(start_services=True):
     storage.ensure_local_dirs()
 
     db.init_app(app)
+
+    oauth.init_app(app)
+    google_client_id = os.environ.get('GOOGLE_CLIENT_ID')
+    google_client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    app.config['GOOGLE_OAUTH_ENABLED'] = bool(google_client_id and google_client_secret)
+    if app.config['GOOGLE_OAUTH_ENABLED']:
+        oauth.register(
+            name='google',
+            client_id=google_client_id,
+            client_secret=google_client_secret,
+            server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+            client_kwargs={'scope': 'openid email profile'},
+        )
 
     from admin import admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
@@ -358,6 +379,51 @@ def register_routes(app):
         HistoryItem.query.filter_by(user_id=user.id).delete()
         db.session.commit()
         return redirect(url_for('profile'))
+
+    @app.route('/login/google')
+    def login_google():
+        if not app.config['GOOGLE_OAUTH_ENABLED']:
+            flash('ការចូលប្រើតាម Google មិនទាន់អាចប្រើបានទេ', 'error')
+            return redirect(url_for('login'))
+        next_target = safe_redirect_target(request.args.get('next'))
+        if next_target:
+            session['login_next'] = next_target
+        redirect_uri = url_for('login_google_callback', _external=True)
+        return oauth.google.authorize_redirect(redirect_uri)
+
+    @app.route('/login/google/callback')
+    def login_google_callback():
+        if not app.config['GOOGLE_OAUTH_ENABLED']:
+            return redirect(url_for('login'))
+        try:
+            token = oauth.google.authorize_access_token()
+            userinfo = token.get('userinfo') or oauth.google.userinfo(token=token)
+        except Exception:
+            flash('ការចូលប្រើតាម Google មិនបានសម្រេចទេ សូមព្យាយាមម្តងទៀត', 'error')
+            return redirect(url_for('login'))
+
+        google_id = userinfo.get('sub')
+        email = (userinfo.get('email') or '').strip().lower()
+        name = userinfo.get('name') or (email.split('@')[0] if email else 'អ្នកប្រើប្រាស់')
+
+        if not google_id or not email:
+            flash('មិនអាចទទួលបានព័ត៌មានគណនី Google បានទេ', 'error')
+            return redirect(url_for('login'))
+
+        user = User.query.filter_by(google_id=google_id).first()
+        if not user:
+            user = User.query.filter_by(email=email).first()
+            if user:
+                user.google_id = google_id  # link Google to an existing email/password account
+            else:
+                user = User(name=name, email=email, google_id=google_id)
+                user.set_password(secrets.token_urlsafe(32))  # unusable random password
+                db.session.add(user)
+            db.session.commit()
+
+        session['user_id'] = user.id
+        target = safe_redirect_target(session.pop('login_next', None))
+        return redirect(target or url_for('index'))
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():
