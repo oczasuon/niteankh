@@ -29,6 +29,7 @@ class User(db.Model):
     location = db.Column(db.String(255), nullable=True)
     google_id = db.Column(db.String(64), unique=True, nullable=True)
     telegram_id = db.Column(db.String(64), unique=True, nullable=True)
+    session_token = db.Column(db.String(64), nullable=True)  # single-active-session enforcement
     created_at = db.Column(db.DateTime, default=now)
 
     def set_password(self, password):

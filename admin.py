@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, flash, redirect, render_template, requ
 
 import storage
 import telegram_userbot
-from helpers import admin_required, get_categories, get_current_user, get_setting, set_setting, staff_required, to_embeddable_url
+from helpers import admin_required, get_categories, get_current_user, get_setting, login_user, set_setting, staff_required, to_embeddable_url
 from models import Category, Episode, Movie, User, WalletTransaction, db
 
 admin_bp = Blueprint('admin', __name__)
@@ -18,7 +18,7 @@ def login():
         password = request.form.get('password', '')
         user = User.query.filter_by(email=email).first()
         if user and user.is_staff and user.check_password(password):
-            session['user_id'] = user.id
+            login_user(user)
             if user.role == User.ROLE_POSTER:
                 return redirect(url_for('admin.upload'))
             return redirect(url_for('admin.dashboard'))

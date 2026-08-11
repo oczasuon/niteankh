@@ -15,7 +15,7 @@ import telegram_verify
 from helpers import (
     REDEEM_CODES, TOPUP_PACKAGES, VIP_PLANS, add_guest_watch_seconds, calculate_coins_for_khr,
     get_categories, get_current_user, get_setting, guest_time_limit_reached,
-    guest_would_exceed_movie_limit, login_required, register_guest_movie_view,
+    guest_would_exceed_movie_limit, login_required, login_user, register_guest_movie_view,
     safe_redirect_target, verify_telegram_auth,
 )
 from models import BankTransaction, Episode, HistoryItem, Movie, MyListItem, User, WalletTransaction, db
@@ -48,6 +48,10 @@ def create_app(start_services=True):
     app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 MB upload cap
+    # Sessions are marked permanent on login (see helpers.login_user) and should
+    # last effectively indefinitely — the only things that end one are an
+    # explicit logout or logging in again elsewhere (single active session).
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650)
 
     storage.ensure_local_dirs()
 
@@ -435,7 +439,7 @@ def register_routes(app):
                 db.session.add(user)
             db.session.commit()
 
-        session['user_id'] = user.id
+        login_user(user)
         target = safe_redirect_target(session.pop('login_next', None))
         return redirect(target or url_for('index'))
 
@@ -465,7 +469,7 @@ def register_routes(app):
             db.session.add(user)
             db.session.commit()
 
-        session['user_id'] = user.id
+        login_user(user)
         return redirect(next_target or url_for('index'))
 
     @app.route('/login', methods=['GET', 'POST'])
@@ -475,7 +479,7 @@ def register_routes(app):
             password = request.form.get('password', '')
             user = User.query.filter_by(email=email).first()
             if user and user.check_password(password):
-                session['user_id'] = user.id
+                login_user(user)
                 target = safe_redirect_target(request.args.get('next'))
                 return redirect(target or url_for('index'))
             flash('អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ', 'error')
@@ -501,7 +505,7 @@ def register_routes(app):
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        session['user_id'] = user.id
+        login_user(user)
         return redirect(url_for('index'))
 
     @app.route('/logout')

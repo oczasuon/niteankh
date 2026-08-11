@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import re
+import secrets
 import time
 from functools import wraps
 from urllib.parse import parse_qs, urlparse
@@ -146,11 +147,29 @@ def calculate_coins_for_khr(amount_khr):
     return round(amount_khr * _BASE_COINS_PER_KHR)
 
 
+def login_user(user):
+    """Logs a user in as the single active session for their account — any
+    session cookie from a previous device/browser stops matching the moment
+    this runs, since it overwrites the one token stored on the user row.
+    Session is marked permanent (see PERMANENT_SESSION_LIFETIME) so it does
+    not expire on its own; only an explicit logout or a login elsewhere ends it."""
+    user.session_token = secrets.token_hex(32)
+    db.session.commit()
+    session.permanent = True
+    session['user_id'] = user.id
+    session['session_token'] = user.session_token
+
+
 def get_current_user():
     uid = session.get('user_id')
     if not uid:
         return None
-    return User.query.get(uid)
+    user = User.query.get(uid)
+    if not user or user.session_token != session.get('session_token'):
+        session.pop('user_id', None)
+        session.pop('session_token', None)
+        return None
+    return user
 
 
 def login_required(view):
