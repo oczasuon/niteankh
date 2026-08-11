@@ -113,7 +113,7 @@ def register_routes(app):
             hero_movies += fill_query.limit(5 - len(hero_movies)).all()
 
         page = request.args.get('page', 1, type=int)
-        pagination = Movie.query.order_by(Movie.id.asc()).paginate(page=page, per_page=30, error_out=False)
+        pagination = Movie.query.order_by(Movie.id.desc()).paginate(page=page, per_page=30, error_out=False)
         return render_template('index.html', hero_movies=hero_movies, movies=pagination.items, pagination=pagination)
 
     @app.route('/movies')
@@ -131,7 +131,7 @@ def register_routes(app):
         elif sort == 'rating':
             query = query.order_by(Movie.rating.desc())
         else:
-            query = query.order_by(Movie.id.asc())
+            query = query.order_by(Movie.id.desc())
 
         pagination = query.paginate(page=page, per_page=24, error_out=False)
         return render_template('movies.html', movies=pagination.items, pagination=pagination,
@@ -149,7 +149,7 @@ def register_routes(app):
         if category != 'all':
             query = query.filter_by(category=category)
 
-        pagination = query.order_by(Movie.id.asc()).paginate(page=page, per_page=24, error_out=False)
+        pagination = query.order_by(Movie.id.desc()).paginate(page=page, per_page=24, error_out=False)
         return render_template('search.html', movies=pagination.items, pagination=pagination, q=q, category=category)
 
     @app.route('/watch/<int:movie_id>')
