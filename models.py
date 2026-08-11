@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -82,6 +82,13 @@ class Movie(db.Model):
     @property
     def has_slide_image(self):
         return bool(self.slide_image_filename)
+
+    @property
+    def is_new(self):
+        if not self.created_at:
+            return False
+        created = self.created_at if self.created_at.tzinfo else self.created_at.replace(tzinfo=timezone.utc)
+        return (now() - created) <= timedelta(days=7)
 
     @property
     def has_video(self):

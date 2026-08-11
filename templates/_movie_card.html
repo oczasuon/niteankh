@@ -11,6 +11,9 @@
         {% if movie.vip %}
             <span class="absolute top-1 right-1 bg-gold text-black text-[8px] font-extrabold px-1.5 py-0.5 rounded shadow">VIP</span>
         {% endif %}
+        {% if movie.is_new %}
+            <span class="absolute top-1 left-1 bg-red-600 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded shadow">NEW</span>
+        {% endif %}
     </div>
     <div class="p-2">
         <h3 class="text-xs font-bold text-gray-800 dark:text-gray-100 truncate">{{ movie.title }}</h3>
