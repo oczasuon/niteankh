@@ -30,6 +30,7 @@ class User(db.Model):
     google_id = db.Column(db.String(64), unique=True, nullable=True)
     telegram_id = db.Column(db.String(64), unique=True, nullable=True)
     session_token = db.Column(db.String(64), nullable=True)  # single-active-session enforcement
+    avatar_filename = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=now)
 
     def set_password(self, password):
@@ -37,6 +38,10 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    @property
+    def has_avatar(self):
+        return bool(self.avatar_filename)
 
     @property
     def is_admin(self):

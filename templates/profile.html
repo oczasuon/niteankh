@@ -13,8 +13,12 @@
 <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
     <section class="bg-white dark:bg-cardbg border border-gray-200 dark:border-zinc-800 rounded-xl p-5 sm:p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0">
-            <span class="font-moul text-gold text-2xl sm:text-3xl">{{ current_user.name[0] }}</span>
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+            {% if current_user.has_avatar %}
+                <img src="{{ media_url('avatars', current_user.avatar_filename) }}" class="w-full h-full object-cover" alt="{{ current_user.name }}">
+            {% else %}
+                <span class="font-moul text-gold text-2xl sm:text-3xl">{{ current_user.name[0] }}</span>
+            {% endif %}
         </div>
         <div class="flex-1 min-w-0 text-center sm:text-left">
             <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 justify-center sm:justify-start">
@@ -96,6 +100,27 @@
         <div id="tab-settings" class="tab-panel py-5 max-w-md">
             <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">{{ t('profile.info_heading') }}</h2>
             <form method="post" action="{{ url_for('profile_settings') }}" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('profile.photo_label') }}</label>
+                    <div class="flex items-center gap-3">
+                        <div class="w-14 h-14 rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {% if current_user.has_avatar %}
+                                <img src="{{ media_url('avatars', current_user.avatar_filename) }}" class="w-full h-full object-cover" alt="{{ current_user.name }}">
+                            {% else %}
+                                <span class="font-moul text-gold text-lg">{{ current_user.name[0] }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <input name="avatar" type="file" accept="image/*" class="w-full text-xs text-gray-600 dark:text-zinc-400 file:mr-3 file:bg-gold file:hover:bg-gold-light file:text-black file:font-semibold file:text-xs file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:cursor-pointer cursor-pointer">
+                            {% if current_user.has_avatar %}
+                                <label class="text-[11px] text-red-500 hover:text-red-600 transition flex items-center gap-1 mt-1.5 cursor-pointer w-fit">
+                                    <input type="checkbox" name="remove_avatar" value="1" class="hidden peer">
+                                    <span class="peer-checked:underline"><i class="fa-solid fa-xmark mr-1"></i>{{ t('admin.upload.remove') }}</span>
+                                </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.full_name') }}</label>
                     <input name="name" type="text" value="{{ current_user.name }}" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">

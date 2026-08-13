@@ -379,6 +379,9 @@ TRANSLATIONS = {
     'admin.upload.upload_btn': {'km': 'ផ្ទុក', 'en': 'Upload'},
     'admin.upload.embed_placeholder': {'km': 'ឬតំណ Embed (YouTube, Drive, ...)', 'en': 'Or embed URL (YouTube, Drive, ...)'},
     'admin.upload.delete_ep_confirm': {'km': 'លុបវីដេអូភាគ', 'en': 'Delete video for episode'},
+
+    # --- profile photo ---
+    'profile.photo_label': {'km': 'រូបថតប្រវត្តិរូប', 'en': 'Profile Photo'},
 }
 
 

@@ -356,6 +356,8 @@ def register_routes(app):
         sex = request.form.get('sex', '').strip()
         dob = request.form.get('dob', '').strip()
         location = request.form.get('location', '').strip()
+        avatar_file = request.files.get('avatar')
+        remove_avatar = request.form.get('remove_avatar') == '1'
 
         if name:
             user.name = name
@@ -376,6 +378,18 @@ def register_routes(app):
                 return redirect(url_for('profile'))
         else:
             user.dob = None
+
+        if avatar_file and avatar_file.filename:
+            new_avatar = storage.save_file(avatar_file, 'avatars', storage.ALLOWED_IMAGE_EXT)
+            if new_avatar:
+                storage.delete_file('avatars', user.avatar_filename)
+                user.avatar_filename = new_avatar
+            else:
+                flash('ប្រភេទឯកសាររូបភាពមិនត្រូវបានអនុញ្ញាតទេ', 'error')
+                return redirect(url_for('profile'))
+        elif remove_avatar and user.avatar_filename:
+            storage.delete_file('avatars', user.avatar_filename)
+            user.avatar_filename = None
 
         db.session.commit()
         flash('បានរក្សាទុករួចរាល់', 'success')

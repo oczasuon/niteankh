@@ -17,6 +17,7 @@ LOCAL_DIRS = {
     'thumbnails': os.path.join(BASE_DIR, 'static', 'uploads', 'thumbnails'),
     'slides': os.path.join(BASE_DIR, 'static', 'uploads', 'slides'),
     'settings': os.path.join(BASE_DIR, 'static', 'images'),
+    'avatars': os.path.join(BASE_DIR, 'static', 'uploads', 'avatars'),
 }
 
 # subfolder name -> path under /static/ (used to build local URLs)
@@ -25,6 +26,7 @@ STATIC_SUBPATH = {
     'thumbnails': 'uploads/thumbnails',
     'slides': 'uploads/slides',
     'settings': 'images',
+    'avatars': 'uploads/avatars',
 }
 
 R2_ACCOUNT_ID = os.environ.get('R2_ACCOUNT_ID')
