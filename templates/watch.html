@@ -92,6 +92,63 @@
                 {% endfor %}
             </div>
         </div>
+
+        <!-- COMMENTS -->
+        <div id="comments" class="mt-6 scroll-mt-20">
+            <h2 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
+                <i class="fa-solid fa-comments text-gold"></i> {{ t('watch.comments_heading') }} ({{ comments|length }})
+            </h2>
+
+            {% if current_user %}
+                <form method="post" action="{{ url_for('add_comment', movie_id=movie.id, ep=ep) }}" class="flex gap-2 mb-5">
+                    <div class="w-8 h-8 rounded-full bg-gold/20 border border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {% if current_user.has_avatar %}
+                            <img src="{{ media_url('avatars', current_user.avatar_filename) }}" class="w-full h-full object-cover" alt="{{ current_user.name }}">
+                        {% else %}
+                            <span class="font-moul text-gold text-xs">{{ current_user.name[0] }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 flex gap-2">
+                        <input name="text" required maxlength="1000" type="text" placeholder="{{ t('watch.comment_placeholder') }}" class="flex-1 bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                        <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2 rounded-lg transition flex-shrink-0">{{ t('watch.post_comment') }}</button>
+                    </div>
+                </form>
+            {% else %}
+                <p class="text-xs text-gray-500 dark:text-zinc-400 mb-5">
+                    <a href="{{ url_for('login', next=request.path) }}" class="text-gold hover:underline">{{ t('watch.login_to_comment') }}</a>
+                </p>
+            {% endif %}
+
+            {% if comments %}
+                <div class="space-y-4">
+                    {% for c in comments %}
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gold/20 border border-gold flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {% if c.user.has_avatar %}
+                                <img src="{{ media_url('avatars', c.user.avatar_filename) }}" class="w-full h-full object-cover" alt="{{ c.user.name }}">
+                            {% else %}
+                                <span class="font-moul text-gold text-xs">{{ c.user.name[0] }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <p class="text-xs font-semibold text-gray-800 dark:text-gray-100">{{ c.user.name }}</p>
+                                <p class="text-[10px] text-gray-400 dark:text-zinc-500">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            </div>
+                            <p class="text-xs sm:text-sm text-gray-600 dark:text-zinc-300 mt-0.5 break-words">{{ c.text }}</p>
+                        </div>
+                        {% if current_user and (current_user.id == c.user_id or current_user.is_admin) %}
+                            <form method="post" action="{{ url_for('delete_comment', comment_id=c.id, ep=ep) }}" onsubmit="return confirm('{{ t('watch.delete_comment_confirm') }}')" class="flex-shrink-0">
+                                <button type="submit" class="text-gray-400 dark:text-zinc-600 hover:text-red-500 transition text-xs px-1"><i class="fa-solid fa-trash"></i></button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-xs text-gray-500 dark:text-zinc-400">{{ t('watch.no_comments') }}</p>
+            {% endif %}
+        </div>
     </div>
 
     <!-- SIDEBAR: RELATED -->

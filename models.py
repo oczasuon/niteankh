@@ -185,3 +185,13 @@ class HistoryItem(db.Model):
 
     movie = db.relationship('Movie')
     __table_args__ = (db.UniqueConstraint('user_id', 'movie_id', name='uq_user_movie_history'),)
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movie.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    text = db.Column(db.String(1000), nullable=False)
+    created_at = db.Column(db.DateTime, default=now)
+
+    user = db.relationship('User')

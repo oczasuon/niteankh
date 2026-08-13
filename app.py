@@ -18,7 +18,7 @@ from helpers import (
     guest_would_exceed_movie_limit, login_required, login_user, register_guest_movie_view,
     safe_redirect_target, verify_telegram_auth,
 )
-from models import BankTransaction, Episode, HistoryItem, Movie, MyListItem, User, WalletTransaction, db
+from models import BankTransaction, Comment, Episode, HistoryItem, Movie, MyListItem, User, WalletTransaction, db
 from translations import t as translate
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -216,8 +216,39 @@ def register_routes(app):
         else:
             player_type, player_value = None, None
 
+        comments = Comment.query.filter_by(movie_id=movie.id).order_by(Comment.created_at.desc()).all()
+
         return render_template('watch.html', movie=movie, ep=ep, vip_locked=vip_locked, guest_gate=guest_gate,
-                                in_list=in_list, related=related, player_type=player_type, player_value=player_value)
+                                in_list=in_list, related=related, player_type=player_type, player_value=player_value,
+                                comments=comments)
+
+    @app.post('/watch/<int:movie_id>/comment')
+    @login_required
+    def add_comment(movie_id):
+        movie = Movie.query.get_or_404(movie_id)
+        user = get_current_user()
+        text = request.form.get('text', '').strip()
+        ep = request.args.get('ep', 1, type=int)
+
+        if text:
+            text = text[:1000]
+            db.session.add(Comment(movie_id=movie.id, user_id=user.id, text=text))
+            db.session.commit()
+
+        return redirect(url_for('watch', movie_id=movie.id, ep=ep) + '#comments')
+
+    @app.post('/comment/<int:comment_id>/delete')
+    @login_required
+    def delete_comment(comment_id):
+        comment = Comment.query.get_or_404(comment_id)
+        user = get_current_user()
+        ep = request.args.get('ep', 1, type=int)
+
+        if comment.user_id == user.id or user.is_admin:
+            db.session.delete(comment)
+            db.session.commit()
+
+        return redirect(url_for('watch', movie_id=comment.movie_id, ep=ep) + '#comments')
 
     @app.post('/watch/track-progress')
     def track_progress():

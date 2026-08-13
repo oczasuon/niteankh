@@ -382,6 +382,14 @@ TRANSLATIONS = {
 
     # --- profile photo ---
     'profile.photo_label': {'km': 'រូបថតប្រវត្តិរូប', 'en': 'Profile Photo'},
+
+    # --- comments ---
+    'watch.comments_heading': {'km': 'មតិយោបល់', 'en': 'Comments'},
+    'watch.comment_placeholder': {'km': 'សរសេរមតិយោបល់របស់អ្នក...', 'en': 'Write your comment...'},
+    'watch.post_comment': {'km': 'បង្ហោះមតិយោបល់', 'en': 'Post Comment'},
+    'watch.login_to_comment': {'km': 'សូមចូលប្រើ ដើម្បីសរសេរមតិយោបល់', 'en': 'Please login to leave a comment'},
+    'watch.no_comments': {'km': 'មិនទាន់មានមតិយោបល់នៅឡើយទេ សូមក្លាយជាអ្នកដំបូង!', 'en': 'No comments yet — be the first!'},
+    'watch.delete_comment_confirm': {'km': 'លុបមតិយោបល់នេះ?', 'en': 'Delete this comment?'},
 }
 
 
