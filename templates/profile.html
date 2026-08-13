@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}ប្រវត្តិរូប - NITEANKH{% endblock %}
+{% block title %}{{ t('profile.title') }} - NITEANKH{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -20,28 +20,28 @@
             <div class="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 justify-center sm:justify-start">
                 <h1 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">{{ current_user.name }}</h1>
                 {% if current_user.is_vip_active %}
-                    <span class="inline-flex items-center gap-1 bg-gold/20 text-gold border border-gold/50 text-[10px] font-bold px-2 py-0.5 rounded-full self-center"><i class="fa-solid fa-crown"></i> សមាជិក VIP ({{ current_user.vip_days_left }}d)</span>
+                    <span class="inline-flex items-center gap-1 bg-gold/20 text-gold border border-gold/50 text-[10px] font-bold px-2 py-0.5 rounded-full self-center"><i class="fa-solid fa-crown"></i> {{ t('profile.vip_member') }} ({{ current_user.vip_days_left }}d)</span>
                 {% else %}
-                    <span class="inline-flex items-center gap-1 bg-zinc-200 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 text-[10px] font-bold px-2 py-0.5 rounded-full self-center"><i class="fa-regular fa-star"></i> សមាជិកទូទៅ</span>
+                    <span class="inline-flex items-center gap-1 bg-zinc-200 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 text-[10px] font-bold px-2 py-0.5 rounded-full self-center"><i class="fa-regular fa-star"></i> {{ t('profile.regular_member') }}</span>
                 {% endif %}
             </div>
             <p class="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-1">{{ current_user.email }}</p>
             <div class="flex items-center justify-center sm:justify-start gap-4 sm:gap-6 mt-4 text-center">
-                <div><p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">{{ my_list|length }}</p><p class="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400">បញ្ជីរបស់ខ្ញុំ</p></div>
+                <div><p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">{{ my_list|length }}</p><p class="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400">{{ t('profile.my_list') }}</p></div>
                 <div class="w-px h-8 bg-gray-200 dark:bg-zinc-800"></div>
-                <div><p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">{{ history|length }}</p><p class="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400">មើលរួច</p></div>
+                <div><p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">{{ history|length }}</p><p class="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400">{{ t('profile.watched') }}</p></div>
             </div>
         </div>
         <a href="{{ url_for('wallet') }}" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2 rounded flex items-center gap-2 transition flex-shrink-0">
-            <i class="fa-solid fa-crown"></i> {{ 'បន្តសមាជិកភាព VIP' if current_user.is_vip_active else 'ដំឡើងកម្រិត VIP' }}
+            <i class="fa-solid fa-crown"></i> {{ t('profile.renew_vip') if current_user.is_vip_active else t('profile.upgrade_vip') }}
         </a>
     </section>
 
     <section>
         <div class="flex items-center gap-1 border-b border-gray-200 dark:border-zinc-800 overflow-x-auto no-scrollbar text-xs sm:text-sm">
-            <button class="tab-btn active px-4 py-2.5 border-b-2 border-transparent font-semibold text-gray-600 dark:text-zinc-400 whitespace-nowrap transition" onclick="setTab('mylist', this)"><i class="fa-solid fa-bookmark mr-1"></i> បញ្ជីរបស់ខ្ញុំ</button>
-            <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent font-semibold text-gray-600 dark:text-zinc-400 whitespace-nowrap transition" onclick="setTab('history', this)"><i class="fa-solid fa-clock-rotate-left mr-1"></i> មើលរួច</button>
-            <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent font-semibold text-gray-600 dark:text-zinc-400 whitespace-nowrap transition" onclick="setTab('settings', this)"><i class="fa-solid fa-gear mr-1"></i> ការកំណត់គណនី</button>
+            <button class="tab-btn active px-4 py-2.5 border-b-2 border-transparent font-semibold text-gray-600 dark:text-zinc-400 whitespace-nowrap transition" onclick="setTab('mylist', this)"><i class="fa-solid fa-bookmark mr-1"></i> {{ t('profile.my_list') }}</button>
+            <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent font-semibold text-gray-600 dark:text-zinc-400 whitespace-nowrap transition" onclick="setTab('history', this)"><i class="fa-solid fa-clock-rotate-left mr-1"></i> {{ t('profile.watched') }}</button>
+            <button class="tab-btn px-4 py-2.5 border-b-2 border-transparent font-semibold text-gray-600 dark:text-zinc-400 whitespace-nowrap transition" onclick="setTab('settings', this)"><i class="fa-solid fa-gear mr-1"></i> {{ t('profile.tab_settings') }}</button>
         </div>
 
         <div id="tab-mylist" class="tab-panel active py-5">
@@ -52,8 +52,8 @@
             {% else %}
             <div class="flex flex-col items-center justify-center text-center py-16 gap-3">
                 <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-zinc-900 flex items-center justify-center border border-gray-200 dark:border-zinc-800"><i class="fa-solid fa-bookmark text-gray-400 dark:text-zinc-500"></i></div>
-                <p class="text-sm text-gray-600 dark:text-zinc-400">អ្នកមិនទាន់មានរឿងក្នុងបញ្ជីរបស់អ្នកទេ</p>
-                <a href="{{ url_for('movies') }}" class="text-gold text-xs font-semibold hover:underline">រកមើលរឿង &rarr;</a>
+                <p class="text-sm text-gray-600 dark:text-zinc-400">{{ t('profile.empty_mylist') }}</p>
+                <a href="{{ url_for('movies') }}" class="text-gold text-xs font-semibold hover:underline">{{ t('profile.browse_movies') }} &rarr;</a>
             </div>
             {% endif %}
         </div>
@@ -62,7 +62,7 @@
             {% if history %}
             <div class="flex items-center justify-end mb-3">
                 <form method="post" action="{{ url_for('clear_history') }}">
-                    <button type="submit" class="text-xs text-gray-500 dark:text-zinc-400 hover:text-red-500 transition flex items-center gap-1"><i class="fa-solid fa-trash"></i> សម្អាតប្រវត្តិ</button>
+                    <button type="submit" class="text-xs text-gray-500 dark:text-zinc-400 hover:text-red-500 transition flex items-center gap-1"><i class="fa-solid fa-trash"></i> {{ t('profile.clear_history') }}</button>
                 </form>
             </div>
             <div class="space-y-3">
@@ -77,7 +77,7 @@
                     </div>
                     <div class="min-w-0 flex-1">
                         <h3 class="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{{ item.movie.title }}</h3>
-                        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ item.movie.category }} &bull; ភាគ {{ '%02d' % item.episode_num }}</p>
+                        <p class="text-[10px] sm:text-xs text-gray-500 dark:text-zinc-400 mt-0.5">{{ item.movie.category }} &bull; {{ t('watch.episode_label') }} {{ '%02d' % item.episode_num }}</p>
                         <p class="text-[10px] text-gray-400 dark:text-zinc-500 mt-0.5">{{ item.watched_at.strftime('%Y-%m-%d %H:%M') }}</p>
                     </div>
                     <i class="fa-solid fa-play text-gold text-xs pr-1"></i>
@@ -87,70 +87,70 @@
             {% else %}
             <div class="flex flex-col items-center justify-center text-center py-16 gap-3">
                 <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-zinc-900 flex items-center justify-center border border-gray-200 dark:border-zinc-800"><i class="fa-solid fa-clock-rotate-left text-gray-400 dark:text-zinc-500"></i></div>
-                <p class="text-sm text-gray-600 dark:text-zinc-400">អ្នកមិនទាន់មានប្រវត្តិមើលទេ</p>
-                <a href="{{ url_for('movies') }}" class="text-gold text-xs font-semibold hover:underline">ចាប់ផ្តើមមើល &rarr;</a>
+                <p class="text-sm text-gray-600 dark:text-zinc-400">{{ t('profile.empty_history') }}</p>
+                <a href="{{ url_for('movies') }}" class="text-gold text-xs font-semibold hover:underline">{{ t('profile.start_watching') }} &rarr;</a>
             </div>
             {% endif %}
         </div>
 
         <div id="tab-settings" class="tab-panel py-5 max-w-md">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">ព័ត៌មានប្រវត្តិរូប</h2>
-            <form method="post" action="{{ url_for('profile_settings') }}" class="space-y-4">
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">{{ t('profile.info_heading') }}</h2>
+            <form method="post" action="{{ url_for('profile_settings') }}" enctype="multipart/form-data" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ឈ្មោះពេញ</label>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.full_name') }}</label>
                     <input name="name" type="text" value="{{ current_user.name }}" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">អ៊ីមែល</label>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.email') }}</label>
                     <input name="email" type="email" value="{{ current_user.email }}" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">លេខទូរស័ព្ទ</label>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.phone') }}</label>
                     <input name="phone" type="tel" value="{{ current_user.phone or '' }}" placeholder="0xx xxx xxx" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ភេទ</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.sex') }}</label>
                         <select name="sex" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
-                            <option value="">មិនបញ្ជាក់</option>
-                            <option value="male" {{ 'selected' if current_user.sex == 'male' }}>ប្រុស</option>
-                            <option value="female" {{ 'selected' if current_user.sex == 'female' }}>ស្រី</option>
-                            <option value="other" {{ 'selected' if current_user.sex == 'other' }}>ផ្សេងទៀត</option>
+                            <option value="">{{ t('common.not_specified') }}</option>
+                            <option value="male" {{ 'selected' if current_user.sex == 'male' }}>{{ t('common.male') }}</option>
+                            <option value="female" {{ 'selected' if current_user.sex == 'female' }}>{{ t('common.female') }}</option>
+                            <option value="other" {{ 'selected' if current_user.sex == 'other' }}>{{ t('common.other') }}</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ថ្ងៃខែឆ្នាំកំណើត</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.dob') }}</label>
                         <input name="dob" type="date" value="{{ current_user.dob.isoformat() if current_user.dob else '' }}" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ទីតាំង</label>
+                    <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.location') }}</label>
                     <input name="location" type="text" value="{{ current_user.location or '' }}" placeholder="ភ្នំពេញ" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                 </div>
-                <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">រក្សាទុក</button>
+                <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">{{ t('common.save') }}</button>
             </form>
 
             <div class="mt-8 pt-6 border-t border-gray-200 dark:border-zinc-800">
-                <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">ប្តូរពាក្យសម្ងាត់</h2>
+                <h2 class="text-sm font-bold text-gray-900 dark:text-white mb-3">{{ t('common.change_password') }}</h2>
                 <form method="post" action="{{ url_for('profile_change_password') }}" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ពាក្យសម្ងាត់បច្ចុប្បន្ន</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.current_password') }}</label>
                         <input name="current_password" required type="password" placeholder="••••••••" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">ពាក្យសម្ងាត់ថ្មី (យ៉ាងតិច ៦ តួ)</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.new_password') }} {{ t('common.min_6_chars') }}</label>
                         <input name="new_password" required minlength="6" type="password" placeholder="••••••••" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">បញ្ជាក់ពាក្យសម្ងាត់ថ្មី</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-zinc-400 mb-1.5">{{ t('common.confirm_new_password') }}</label>
                         <input name="confirm_password" required minlength="6" type="password" placeholder="••••••••" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-sm text-gray-800 dark:text-gray-200 rounded-lg px-3.5 py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                     </div>
-                    <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">ប្តូរពាក្យសម្ងាត់</button>
+                    <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-5 py-2 rounded transition">{{ t('common.change_password') }}</button>
                 </form>
             </div>
 
             <div class="mt-8 pt-5 border-t border-gray-200 dark:border-zinc-800">
-                <a href="{{ url_for('logout') }}" class="text-red-500 hover:text-red-600 text-xs sm:text-sm font-semibold flex items-center gap-2 transition"><i class="fa-solid fa-right-from-bracket"></i> ចាកចេញពីគណនី</a>
+                <a href="{{ url_for('logout') }}" class="text-red-500 hover:text-red-600 text-xs sm:text-sm font-semibold flex items-center gap-2 transition"><i class="fa-solid fa-right-from-bracket"></i> {{ t('common.logout') }}</a>
             </div>
         </div>
     </section>

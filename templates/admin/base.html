@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="km" class="dark">
+<html lang="{{ current_lang }}" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,17 +35,17 @@
             <nav class="flex items-center gap-4 text-xs sm:text-sm font-medium overflow-x-auto no-scrollbar">
                 {% if current_user and current_user.is_admin %}
                     {% set tabs = [
-                        (url_for('admin.dashboard'), 'ផ្ទាំងគ្រប់គ្រង'),
-                        (url_for('admin.upload'), 'បង្ហោះខ្លឹមសារ'),
-                        (url_for('admin.manage'), 'គ្រប់គ្រងខ្លឹមសារ'),
-                        (url_for('admin.categories'), 'ប្រភេទ'),
-                        (url_for('admin.users'), 'អ្នកប្រើប្រាស់'),
-                        (url_for('admin.reports'), 'របាយការណ៍'),
-                        (url_for('admin.settings'), 'ការកំណត់'),
+                        (url_for('admin.dashboard'), t('admin.nav.dashboard')),
+                        (url_for('admin.upload'), t('admin.nav.upload')),
+                        (url_for('admin.manage'), t('admin.nav.manage')),
+                        (url_for('admin.categories'), t('admin.nav.categories')),
+                        (url_for('admin.users'), t('admin.nav.users')),
+                        (url_for('admin.reports'), t('admin.nav.reports')),
+                        (url_for('admin.settings'), t('admin.nav.settings')),
                     ] %}
                 {% else %}
                     {% set tabs = [
-                        (url_for('admin.upload'), 'បង្ហោះខ្លឹមសារ'),
+                        (url_for('admin.upload'), t('admin.nav.upload')),
                     ] %}
                 {% endif %}
                 {% for href, label in tabs %}
@@ -54,9 +54,9 @@
             </nav>
 
             <div class="flex items-center gap-3 text-xs sm:text-sm">
-                <a href="{{ url_for('admin.change_password') }}" class="text-zinc-400 hover:text-gold transition" title="ប្តូរពាក្យសម្ងាត់"><i class="fa-solid fa-key"></i></a>
-                <a href="{{ url_for('index') }}" class="text-zinc-400 hover:text-gold transition"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>មើលគេហទំព័រ</a>
-                <a href="{{ url_for('admin.logout') }}" class="text-red-400 hover:text-red-300 transition"><i class="fa-solid fa-right-from-bracket mr-1"></i>ចាកចេញ</a>
+                <a href="{{ url_for('admin.change_password') }}" class="text-zinc-400 hover:text-gold transition" title="{{ t('admin.nav.change_password') }}"><i class="fa-solid fa-key"></i></a>
+                <a href="{{ url_for('index') }}" class="text-zinc-400 hover:text-gold transition"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>{{ t('admin.nav.view_site') }}</a>
+                <a href="{{ url_for('admin.logout') }}" class="text-red-400 hover:text-red-300 transition"><i class="fa-solid fa-right-from-bracket mr-1"></i>{{ t('admin.nav.logout') }}</a>
             </div>
         </div>
     </header>

@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
-{% block title %}ភាពយន្តទាំងអស់ - NITEANKH{% endblock %}
+{% block title %}{{ t('movies.title') }} - NITEANKH{% endblock %}
 
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-2">
     <h1 class="text-base sm:text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-        <i class="fa-solid fa-film text-gold"></i> ភាពយន្តទាំងអស់
+        <i class="fa-solid fa-film text-gold"></i> {{ t('movies.title') }}
     </h1>
     <p class="text-xs sm:text-sm text-gray-500 dark:text-zinc-400 mt-1">
-        សរុប <span class="font-semibold text-gray-700 dark:text-gray-300">{{ pagination.total }}</span> រឿង
+        {{ t('movies.total_count') }} <span class="font-semibold text-gray-700 dark:text-gray-300">{{ pagination.total }}</span> {{ t('movies.count_unit') }}
     </p>
 </section>
 
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs flex-1">
-        <a href="{{ url_for('movies', sort=sort) }}" class="px-4 py-1.5 rounded-full border whitespace-nowrap shadow-sm transition {{ 'chip-active border-gold/60' if category == 'all' else 'bg-white dark:bg-zinc-900/80 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-gray-300 hover:border-gold/50' }}">ទាំងអស់</a>
+        <a href="{{ url_for('movies', sort=sort) }}" class="px-4 py-1.5 rounded-full border whitespace-nowrap shadow-sm transition {{ 'chip-active border-gold/60' if category == 'all' else 'bg-white dark:bg-zinc-900/80 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-gray-300 hover:border-gold/50' }}">{{ t('home.all') }}</a>
         {% for cat in categories %}
             <a href="{{ url_for('movies', category=cat, sort=sort) }}" class="px-4 py-1.5 rounded-full border whitespace-nowrap shadow-sm transition {{ 'chip-active border-gold/60' if category == cat else 'bg-white dark:bg-zinc-900/80 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-gray-300 hover:border-gold/50' }}">{{ cat }}</a>
         {% endfor %}
@@ -21,9 +21,9 @@
     <form method="get" class="flex-shrink-0">
         <input type="hidden" name="category" value="{{ category }}">
         <select name="sort" onchange="this.form.submit()" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-gray-300 text-xs sm:text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-gold transition-colors">
-            <option value="popular" {{ 'selected' if sort == 'popular' }}>ពេញនិយម</option>
-            <option value="newest" {{ 'selected' if sort == 'newest' }}>ថ្មីបំផុត</option>
-            <option value="rating" {{ 'selected' if sort == 'rating' }}>ពិន្ទុខ្ពស់</option>
+            <option value="popular" {{ 'selected' if sort == 'popular' }}>{{ t('movies.sort_popular') }}</option>
+            <option value="newest" {{ 'selected' if sort == 'newest' }}>{{ t('movies.sort_newest') }}</option>
+            <option value="rating" {{ 'selected' if sort == 'rating' }}>{{ t('movies.sort_rating') }}</option>
         </select>
     </form>
 </section>

@@ -1,5 +1,5 @@
 {% extends 'admin/base.html' %}
-{% block title %}អ្នកប្រើប្រាស់ - NITEANKH Admin{% endblock %}
+{% block title %}{{ t('admin.nav.users') }} - NITEANKH Admin{% endblock %}
 
 {% block content %}
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
@@ -7,8 +7,8 @@
     <!-- STAFF MANAGEMENT -->
     <section class="space-y-4">
         <div>
-            <h1 class="text-lg sm:text-xl font-bold text-white">គណនីបុគ្គលិក</h1>
-            <p class="text-xs sm:text-sm text-zinc-500 mt-1">Admin មានសិទ្ធិពេញលេញ &bull; Poster មានសិទ្ធិតែបង្ហោះខ្លឹមសារប៉ុណ្ណោះ</p>
+            <h1 class="text-lg sm:text-xl font-bold text-white">{{ t('admin.users.staff_accounts') }}</h1>
+            <p class="text-xs sm:text-sm text-zinc-500 mt-1">{{ t('admin.users.role_explainer') }}</p>
         </div>
 
         <div class="bg-cardbg border border-zinc-800 rounded-xl overflow-hidden">
@@ -16,10 +16,10 @@
                 <table class="w-full text-xs sm:text-sm">
                     <thead>
                         <tr class="bg-zinc-900/60 text-left text-zinc-400">
-                            <th class="px-4 py-3 font-semibold">ឈ្មោះ</th>
-                            <th class="px-4 py-3 font-semibold hidden sm:table-cell">ចូលរួម</th>
-                            <th class="px-4 py-3 font-semibold">តួនាទី</th>
-                            <th class="px-4 py-3 font-semibold text-right">សកម្មភាព</th>
+                            <th class="px-4 py-3 font-semibold">{{ t('admin.users.col_name') }}</th>
+                            <th class="px-4 py-3 font-semibold hidden sm:table-cell">{{ t('admin.users.col_joined') }}</th>
+                            <th class="px-4 py-3 font-semibold">{{ t('admin.users.col_role') }}</th>
+                            <th class="px-4 py-3 font-semibold text-right">{{ t('admin.users.col_actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-800">
@@ -39,7 +39,7 @@
                             </td>
                             <td class="px-4 py-3 text-right whitespace-nowrap">
                                 {% if staff_user.id == current_user.id %}
-                                    <span class="text-zinc-600 text-[11px]">(គណនីខ្លួនឯង)</span>
+                                    <span class="text-zinc-600 text-[11px]">{{ t('admin.users.self_account') }}</span>
                                 {% else %}
                                     <form method="post" action="{{ url_for('admin.change_staff_role', user_id=staff_user.id) }}" class="inline-flex items-center gap-1.5">
                                         <select name="role" onchange="this.form.submit()" class="bg-zinc-900 border border-zinc-700 text-zinc-200 text-[11px] rounded px-1.5 py-1 focus:outline-none focus:border-gold">
@@ -47,11 +47,11 @@
                                             <option value="admin" {{ 'selected' if staff_user.role == 'admin' }}>Admin</option>
                                         </select>
                                     </form>
-                                    <form method="post" action="{{ url_for('admin.reset_user_password', user_id=staff_user.id) }}" class="inline" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់កំណត់ពាក្យសម្ងាត់ថ្មីសម្រាប់ &quot;{{ staff_user.name }}&quot; មែនទេ?')">
-                                        <button type="submit" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="កំណត់ពាក្យសម្ងាត់ថ្មី"><i class="fa-solid fa-key"></i></button>
+                                    <form method="post" action="{{ url_for('admin.reset_user_password', user_id=staff_user.id) }}" class="inline" onsubmit="return confirm('{{ t('admin.users.reset_password_confirm') }} &quot;{{ staff_user.name }}&quot;?')">
+                                        <button type="submit" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="{{ t('admin.users.reset_password_title') }}"><i class="fa-solid fa-key"></i></button>
                                     </form>
-                                    <form method="post" action="{{ url_for('admin.delete_staff', user_id=staff_user.id) }}" class="inline" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់ដកសិទ្ធិបុគ្គលិករបស់ &quot;{{ staff_user.name }}&quot; មែនទេ? (គណនីនឹងក្លាយជាអតិថិជនធម្មតា)')">
-                                        <button type="submit" class="text-zinc-400 hover:text-red-500 transition inline-block px-1.5" title="ដកសិទ្ធិបុគ្គលិក"><i class="fa-solid fa-user-slash"></i></button>
+                                    <form method="post" action="{{ url_for('admin.delete_staff', user_id=staff_user.id) }}" class="inline" onsubmit="return confirm('{{ t('admin.users.revoke_staff_confirm') }} &quot;{{ staff_user.name }}&quot;{{ t('admin.users.revoke_staff_confirm_suffix') }}')">
+                                        <button type="submit" class="text-zinc-400 hover:text-red-500 transition inline-block px-1.5" title="{{ t('admin.users.revoke_staff_title') }}"><i class="fa-solid fa-user-slash"></i></button>
                                     </form>
                                 {% endif %}
                             </td>
@@ -63,17 +63,17 @@
         </div>
 
         <form method="post" action="{{ url_for('admin.add_staff') }}" class="bg-cardbg border border-zinc-800 rounded-xl p-4 sm:p-5">
-            <p class="text-sm font-semibold text-white mb-3"><i class="fa-solid fa-user-plus text-gold mr-1.5"></i>បន្ថែមគណនីបុគ្គលិកថ្មី</p>
+            <p class="text-sm font-semibold text-white mb-3"><i class="fa-solid fa-user-plus text-gold mr-1.5"></i>{{ t('admin.users.add_staff_heading') }}</p>
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <input name="name" required type="text" placeholder="ឈ្មោះ" class="bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
-                <input name="email" required type="email" placeholder="អ៊ីមែល" class="bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
-                <input name="password" required minlength="6" type="password" placeholder="ពាក្យសម្ងាត់ (យ៉ាងតិច ៦ តួ)" class="bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                <input name="name" required type="text" placeholder="{{ t('admin.users.name_placeholder') }}" class="bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                <input name="email" required type="email" placeholder="{{ t('admin.users.email_placeholder') }}" class="bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                <input name="password" required minlength="6" type="password" placeholder="{{ t('common.password') }} {{ t('common.min_6_chars') }}" class="bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                 <div class="flex gap-2">
                     <select name="role" class="flex-1 bg-zinc-900/90 text-sm text-gray-200 rounded-lg px-3.5 py-2.5 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                         <option value="poster">Poster</option>
                         <option value="admin">Admin</option>
                     </select>
-                    <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-sm px-4 py-2.5 rounded-lg transition whitespace-nowrap">បន្ថែម</button>
+                    <button type="submit" class="bg-gold hover:bg-gold-light text-black font-semibold text-sm px-4 py-2.5 rounded-lg transition whitespace-nowrap">{{ t('admin.categories.add') }}</button>
                 </div>
             </div>
         </form>
@@ -83,11 +83,11 @@
     <section class="space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
-                <h1 class="text-lg sm:text-xl font-bold text-white">អតិថិជនទាំងអស់</h1>
-                <p class="text-xs sm:text-sm text-zinc-500 mt-1">សរុប {{ total_clients }} អ្នកប្រើប្រាស់</p>
+                <h1 class="text-lg sm:text-xl font-bold text-white">{{ t('admin.users.all_clients') }}</h1>
+                <p class="text-xs sm:text-sm text-zinc-500 mt-1">{{ t('admin.users.total_users') }} {{ total_clients }} {{ t('admin.users.users_unit') }}</p>
             </div>
             <form method="get" class="min-w-[200px]">
-                <input name="q" value="{{ q }}" type="text" placeholder="ស្វែងរកតាមឈ្មោះ ឬ អ៊ីមែល..." class="w-full bg-zinc-900/90 text-xs sm:text-sm text-gray-200 rounded-lg px-3.5 py-2 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                <input name="q" value="{{ q }}" type="text" placeholder="{{ t('admin.users.search_client_placeholder') }}" class="w-full bg-zinc-900/90 text-xs sm:text-sm text-gray-200 rounded-lg px-3.5 py-2 border border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
             </form>
         </div>
 
@@ -96,11 +96,11 @@
                 <table class="w-full text-xs sm:text-sm">
                     <thead>
                         <tr class="bg-zinc-900/60 text-left text-zinc-400">
-                            <th class="px-4 py-3 font-semibold">ឈ្មោះ</th>
-                            <th class="px-4 py-3 font-semibold hidden sm:table-cell">ចូលរួម</th>
-                            <th class="px-4 py-3 font-semibold text-right">កាក់</th>
+                            <th class="px-4 py-3 font-semibold">{{ t('admin.users.col_name') }}</th>
+                            <th class="px-4 py-3 font-semibold hidden sm:table-cell">{{ t('admin.users.col_joined') }}</th>
+                            <th class="px-4 py-3 font-semibold text-right">{{ t('admin.users.col_coins') }}</th>
                             <th class="px-4 py-3 font-semibold text-right">VIP</th>
-                            <th class="px-4 py-3 font-semibold text-right">សកម្មភាព</th>
+                            <th class="px-4 py-3 font-semibold text-right">{{ t('admin.users.col_actions') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-800">
@@ -120,8 +120,8 @@
                                 {% endif %}
                             </td>
                             <td class="px-4 py-3 text-right">
-                                <form method="post" action="{{ url_for('admin.reset_user_password', user_id=client.id) }}" class="inline" onsubmit="return confirm('តើអ្នកប្រាកដថាចង់កំណត់ពាក្យសម្ងាត់ថ្មីសម្រាប់ &quot;{{ client.name }}&quot; មែនទេ?')">
-                                    <button type="submit" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="កំណត់ពាក្យសម្ងាត់ថ្មី"><i class="fa-solid fa-key"></i></button>
+                                <form method="post" action="{{ url_for('admin.reset_user_password', user_id=client.id) }}" class="inline" onsubmit="return confirm('{{ t('admin.users.reset_password_confirm') }} &quot;{{ client.name }}&quot;?')">
+                                    <button type="submit" class="text-zinc-400 hover:text-gold transition inline-block px-1.5" title="{{ t('admin.users.reset_password_title') }}"><i class="fa-solid fa-key"></i></button>
                                 </form>
                             </td>
                         </tr>
@@ -132,7 +132,7 @@
             {% if not clients %}
             <div class="flex flex-col items-center justify-center text-center py-14 gap-2">
                 <i class="fa-solid fa-users text-zinc-600 text-xl"></i>
-                <p class="text-sm text-zinc-500">មិនមានអតិថិជនត្រូវនឹងលក្ខខណ្ឌនេះទេ</p>
+                <p class="text-sm text-zinc-500">{{ t('admin.users.no_clients') }}</p>
             </div>
             {% endif %}
         </div>

@@ -19,6 +19,7 @@ from helpers import (
     safe_redirect_target, verify_telegram_auth,
 )
 from models import BankTransaction, Episode, HistoryItem, Movie, MyListItem, User, WalletTransaction, db
+from translations import t as translate
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 oauth = OAuth()
@@ -95,9 +96,11 @@ def create_app(start_services=True):
 
     @app.context_processor
     def inject_globals():
+        lang = session.get('lang', 'km')
         return dict(
             current_user=get_current_user(), categories=get_categories(),
             telegram_login_bot_username=app.config['TELEGRAM_LOGIN_BOT_USERNAME'],
+            t=lambda key: translate(key, lang), current_lang=lang,
         )
 
     register_routes(app)
@@ -105,6 +108,14 @@ def create_app(start_services=True):
 
 
 def register_routes(app):
+
+    @app.route('/set-language/<lang>')
+    def set_language(lang):
+        if lang in ('km', 'en'):
+            session['lang'] = lang
+            session.permanent = True
+        target = safe_redirect_target(request.args.get('next'))
+        return redirect(target or url_for('index'))
 
     @app.route('/')
     def index():

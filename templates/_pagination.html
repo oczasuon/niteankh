@@ -4,9 +4,9 @@
 {% set _ = qs.update(request.view_args) %}
 <div class="flex items-center justify-center gap-1.5 sm:gap-2 py-6 text-xs sm:text-sm">
     {% if pagination.has_prev %}
-        <a href="{{ url_for(request.endpoint, page=pagination.prev_num, **qs) }}" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-zinc-800 shadow-sm transition">ថយក្រោយ</a>
+        <a href="{{ url_for(request.endpoint, page=pagination.prev_num, **qs) }}" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-zinc-800 shadow-sm transition">{{ t('common.prev') }}</a>
     {% else %}
-        <span class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-300 dark:text-zinc-700 border border-gray-200 dark:border-zinc-800 shadow-sm opacity-40 cursor-not-allowed">ថយក្រោយ</span>
+        <span class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-300 dark:text-zinc-700 border border-gray-200 dark:border-zinc-800 shadow-sm opacity-40 cursor-not-allowed">{{ t('common.prev') }}</span>
     {% endif %}
 
     <div class="flex items-center gap-1.5">
@@ -24,9 +24,9 @@
     </div>
 
     {% if pagination.has_next %}
-        <a href="{{ url_for(request.endpoint, page=pagination.next_num, **qs) }}" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white font-medium border border-gray-200 dark:border-zinc-800 shadow-sm transition">មុខបន្ទាប់</a>
+        <a href="{{ url_for(request.endpoint, page=pagination.next_num, **qs) }}" class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-900 dark:text-white font-medium border border-gray-200 dark:border-zinc-800 shadow-sm transition">{{ t('common.next') }}</a>
     {% else %}
-        <span class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-300 dark:text-zinc-700 font-medium border border-gray-200 dark:border-zinc-800 shadow-sm opacity-40 cursor-not-allowed">មុខបន្ទាប់</span>
+        <span class="px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-900 text-gray-300 dark:text-zinc-700 font-medium border border-gray-200 dark:border-zinc-800 shadow-sm opacity-40 cursor-not-allowed">{{ t('common.next') }}</span>
     {% endif %}
 </div>
 {% endif %}

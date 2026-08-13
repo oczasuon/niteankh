@@ -1,20 +1,20 @@
 {% extends 'admin/base.html' %}
-{% block title %}ផ្ទាំងគ្រប់គ្រង - NITEANKH Admin{% endblock %}
+{% block title %}{{ t('admin.nav.dashboard') }} - NITEANKH Admin{% endblock %}
 
 {% block content %}
 <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
     <div>
-        <h1 class="text-lg sm:text-xl font-bold text-white">ផ្ទាំងគ្រប់គ្រង</h1>
-        <p class="text-xs sm:text-sm text-zinc-500 mt-1">ទិដ្ឋភាពទូទៅនៃខ្លឹមសារនៅលើវេទិកា</p>
+        <h1 class="text-lg sm:text-xl font-bold text-white">{{ t('admin.nav.dashboard') }}</h1>
+        <p class="text-xs sm:text-sm text-zinc-500 mt-1">{{ t('admin.dashboard.subtitle') }}</p>
     </div>
 
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
-            <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-film text-gold"></i> ខ្លឹមសារសរុប</p>
+            <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-film text-gold"></i> {{ t('admin.dashboard.total_content') }}</p>
             <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ total_movies }}</p>
         </div>
         <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
-            <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-up text-gold"></i> បង្ហោះដោយ Admin</p>
+            <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-up text-gold"></i> {{ t('admin.dashboard.admin_uploads') }}</p>
             <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ admin_uploads }}</p>
         </div>
         <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
@@ -22,18 +22,18 @@
             <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ vip_count }}</p>
         </div>
         <div class="bg-cardbg border border-zinc-800 rounded-xl p-4">
-            <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-tags text-gold"></i> ប្រភេទ</p>
+            <p class="text-[11px] text-zinc-500 flex items-center gap-1.5"><i class="fa-solid fa-tags text-gold"></i> {{ t('admin.dashboard.categories') }}</p>
             <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">{{ category_count }}</p>
         </div>
     </div>
 
     <div class="flex flex-wrap gap-3">
-        <a href="{{ url_for('admin.upload') }}" class="flex items-center gap-2 bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-lg transition"><i class="fa-solid fa-plus"></i> បង្ហោះខ្លឹមសារថ្មី</a>
-        <a href="{{ url_for('admin.manage') }}" class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 hover:border-gold/60 text-zinc-200 font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-lg transition"><i class="fa-solid fa-list"></i> គ្រប់គ្រងខ្លឹមសារទាំងអស់</a>
+        <a href="{{ url_for('admin.upload') }}" class="flex items-center gap-2 bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-lg transition"><i class="fa-solid fa-plus"></i> {{ t('admin.dashboard.upload_new') }}</a>
+        <a href="{{ url_for('admin.manage') }}" class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 hover:border-gold/60 text-zinc-200 font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-lg transition"><i class="fa-solid fa-list"></i> {{ t('admin.dashboard.manage_all') }}</a>
     </div>
 
     <div>
-        <h2 class="text-sm sm:text-base font-bold text-white mb-3">ខ្លឹមសារបង្ហោះថ្មីៗ</h2>
+        <h2 class="text-sm sm:text-base font-bold text-white mb-3">{{ t('admin.dashboard.recent_uploads') }}</h2>
         {% if recent %}
         <div class="space-y-2">
             {% for movie in recent %}
@@ -47,7 +47,7 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="text-xs sm:text-sm font-semibold text-white truncate">{{ movie.title }}</p>
-                    <p class="text-[11px] text-zinc-500 mt-0.5">{{ movie.category }} &bull; {{ movie.total_episodes }} ភាគ {{ '&bull; VIP'|safe if movie.vip }}</p>
+                    <p class="text-[11px] text-zinc-500 mt-0.5">{{ movie.category }} &bull; {{ movie.total_episodes }} {{ t('common.episodes_unit') }} {{ '&bull; VIP'|safe if movie.vip }}</p>
                 </div>
                 <i class="fa-solid fa-arrow-up-right-from-square text-zinc-600 text-xs pr-1"></i>
             </a>
@@ -56,8 +56,8 @@
         {% else %}
         <div class="flex flex-col items-center justify-center text-center py-12 gap-3 bg-cardbg border border-dashed border-zinc-800 rounded-xl">
             <i class="fa-solid fa-cloud-arrow-up text-zinc-600 text-xl"></i>
-            <p class="text-sm text-zinc-500">មិនទាន់មានខ្លឹមសារបង្ហោះដោយ Admin ទេ</p>
-            <a href="{{ url_for('admin.upload') }}" class="text-gold text-xs font-semibold hover:underline">បង្ហោះឥឡូវ &rarr;</a>
+            <p class="text-sm text-zinc-500">{{ t('admin.dashboard.no_uploads') }}</p>
+            <a href="{{ url_for('admin.upload') }}" class="text-gold text-xs font-semibold hover:underline">{{ t('admin.dashboard.upload_now') }} &rarr;</a>
         </div>
         {% endif %}
     </div>

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}សមាជិក VIP - NITEANKH{% endblock %}
+{% block title %}{{ t('membership.title') }} - NITEANKH{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -18,15 +18,15 @@
         <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gold/20 border border-gold/50 mb-4">
             <i class="fa-solid fa-crown text-gold text-xl sm:text-2xl"></i>
         </div>
-        <h1 class="text-xl sm:text-3xl font-bold text-white">ដំឡើងកម្រិតទៅជា <span class="text-gold">VIP</span></h1>
+        <h1 class="text-xl sm:text-3xl font-bold text-white">{{ t('membership.upgrade_to') }} <span class="text-gold">VIP</span></h1>
         <p class="text-xs sm:text-sm text-zinc-400 mt-3 max-w-xl mx-auto">
-            រីករាយជាមួយការមើលដោយគ្មានការរំខាន គុណភាព 4K ភាគថ្មីៗមុនគេ និងមាតិកាផ្តាច់មុខសម្រាប់សមាជិក VIP ប៉ុណ្ណោះ។
+            {{ t('membership.hero_desc') }}
         </p>
         <p class="mt-5 inline-flex items-center gap-2 text-xs sm:text-sm bg-white/5 border border-white/10 text-zinc-300 px-4 py-2 rounded-full">
             {% if current_user and current_user.is_vip_active %}
-                <i class="fa-solid fa-crown text-gold"></i> អ្នកគឺជាសមាជិក VIP &mdash; នៅសល់ {{ current_user.vip_days_left }} ថ្ងៃទៀត
+                <i class="fa-solid fa-crown text-gold"></i> {{ t('membership.you_are_vip') }} &mdash; {{ t('wallet.days_remaining_prefix') }} {{ current_user.vip_days_left }} {{ t('wallet.days_remaining_suffix') }}
             {% else %}
-                <i class="fa-regular fa-star text-zinc-500"></i> អ្នកគឺជាសមាជិកទូទៅ
+                <i class="fa-regular fa-star text-zinc-500"></i> {{ t('membership.you_are_regular') }}
             {% endif %}
         </p>
     </div>
@@ -34,7 +34,7 @@
 
 <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-14">
     <section>
-        <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white text-center mb-6">ជ្រើសរើសគម្រោងសមាជិកភាព</h2>
+        <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white text-center mb-6">{{ t('membership.choose_plan_heading') }}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto">
             {% for plan in vip_plans %}
             <div class="plan-card {{ 'featured' if plan.tag }} relative bg-white dark:bg-cardbg border-2 border-gray-200 dark:border-zinc-800 rounded-xl p-5 flex flex-col items-center text-center gap-2">
@@ -42,41 +42,41 @@
                 <i class="fa-solid fa-crown text-gold text-2xl mt-1"></i>
                 <p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">{{ plan.label }}</p>
                 <p class="text-sm text-gray-600 dark:text-zinc-300 flex items-center gap-1 mt-1">
-                    <i class="fa-solid fa-coins text-gold"></i> {{ '{:,}'.format(plan.cost) }} កាក់
+                    <i class="fa-solid fa-coins text-gold"></i> {{ '{:,}'.format(plan.cost) }} {{ t('common.coins_unit') }}
                 </p>
-                <a href="{{ url_for('wallet') }}#vip" class="w-full mt-3 bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2 rounded transition">ជ្រើសរើសគម្រោងនេះ</a>
+                <a href="{{ url_for('wallet') }}#vip" class="w-full mt-3 bg-gold hover:bg-gold-light text-black font-semibold text-xs sm:text-sm px-4 py-2 rounded transition">{{ t('membership.select_this_plan') }}</a>
             </div>
             {% endfor %}
         </div>
         <p class="text-center text-[11px] sm:text-xs text-gray-500 dark:text-zinc-400 mt-4">
-            ការទូទាត់ប្រើប្រាស់សមតុល្យក្នុង <a href="{{ url_for('wallet') }}" class="text-gold hover:underline">កាបូប</a> របស់អ្នក
+            {{ t('membership.payment_note_prefix') }} <a href="{{ url_for('wallet') }}" class="text-gold hover:underline">{{ t('nav.wallet') }}</a> {{ t('membership.payment_note_suffix') }}
         </p>
     </section>
 
     <section>
-        <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white text-center mb-6">អត្ថប្រយោជន៍ VIP</h2>
+        <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white text-center mb-6">{{ t('membership.benefits_heading') }}</h2>
         <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-zinc-800">
             <table class="w-full text-xs sm:text-sm">
                 <thead>
                     <tr class="bg-gray-50 dark:bg-zinc-900/60">
-                        <th class="text-left px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">មុខងារ</th>
-                        <th class="px-4 py-3 font-semibold text-gray-500 dark:text-zinc-400">ទូទៅ</th>
+                        <th class="text-left px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">{{ t('membership.feature_col') }}</th>
+                        <th class="px-4 py-3 font-semibold text-gray-500 dark:text-zinc-400">{{ t('membership.free_col') }}</th>
                         <th class="px-4 py-3 font-semibold text-gold">VIP</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-zinc-800">
                     {% set features = [
-                        ('មើលវីដេអូគុណភាព HD', true, true),
-                        ('មើលវីដេអូគុណភាព 4K', false, true),
-                        ('ភាគថ្មីៗចេញមុនគេ', false, true),
-                        ('មាតិកាផ្តាច់មុខ VIP ប៉ុណ្ណោះ', false, true),
-                        ('គ្មានការកំណត់ចំនួនភាគក្នុងមួយថ្ងៃ', false, true),
-                        ('ការគាំទ្រអតិថិជនអាទិភាព', false, true),
-                        ('រក្សាទុកបញ្ជីរបស់ខ្ញុំ', true, true),
+                        ('membership.feature.hd', true, true),
+                        ('membership.feature.4k', false, true),
+                        ('membership.feature.early_access', false, true),
+                        ('membership.feature.exclusive', false, true),
+                        ('membership.feature.no_limit', false, true),
+                        ('membership.feature.priority_support', false, true),
+                        ('membership.feature.save_mylist', true, true),
                     ] %}
-                    {% for label, free, vip in features %}
+                    {% for label_key, free, vip in features %}
                     <tr>
-                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ label }}</td>
+                        <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ t(label_key) }}</td>
                         <td class="px-4 py-3 text-center">{% if free %}<i class="fa-solid fa-circle-check text-emerald-500"></i>{% else %}<i class="fa-solid fa-circle-xmark text-gray-300 dark:text-zinc-700"></i>{% endif %}</td>
                         <td class="px-4 py-3 text-center">{% if vip %}<i class="fa-solid fa-circle-check text-emerald-500"></i>{% else %}<i class="fa-solid fa-circle-xmark text-gray-300 dark:text-zinc-700"></i>{% endif %}</td>
                     </tr>
@@ -87,22 +87,22 @@
     </section>
 
     <section>
-        <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white text-center mb-6">សំណួរដែលសួរញឹកញាប់</h2>
+        <h2 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white text-center mb-6">{{ t('membership.faq_heading') }}</h2>
         <div id="faqList" class="max-w-2xl mx-auto space-y-2">
             {% set faqs = [
-                ('តើខ្ញុំទូទាត់ថ្លៃសមាជិកភាព VIP យ៉ាងដូចម្តេច?', 'ការទូទាត់ប្រើប្រាស់សមតុល្យក្នុងកាបូបរបស់អ្នក។ សូមបញ្ចូលកាបូបជាមុននៅទំព័រកាបូប រួចត្រឡប់មកទំព័រនេះដើម្បីជ្រើសរើសគម្រោង។'),
-                ('តើសមាជិកភាព VIP អាចបន្តដោយស្វ័យប្រវត្តិទេ?', 'ទេ &mdash; សមាជិកភាព VIP មិនបន្តដោយស្វ័យប្រវត្តិទេ។ អ្នកអាចទិញបន្តនៅពេលណាក៏បាន ថ្ងៃដែលនៅសល់នឹងត្រូវបូកបន្ថែម។'),
-                ('តើខ្ញុំអាចប្រើគណនី VIP លើឧបករណ៍ច្រើនបានទេ?', 'បាទ/ចាស សមាជិក VIP អាចប្រើប្រាស់លើឧបករណ៍ច្រើនក្នុងពេលតែមួយ។'),
-                ('តើមានការសងប្រាក់ត្រឡប់ទេប្រសិនបើមិនពេញចិត្ត?', 'កាក់ដែលបានទិញរួចមិនអាចដូរជាសាច់ប្រាក់វិញបានទេ ប៉ុន្តែនៅតែអាចប្រើសម្រាប់ទិញ VIP ឬសេវាកម្មផ្សេងទៀតបាន។'),
+                ('membership.faq.q1', 'membership.faq.a1'),
+                ('membership.faq.q2', 'membership.faq.a2'),
+                ('membership.faq.q3', 'membership.faq.a3'),
+                ('membership.faq.q4', 'membership.faq.a4'),
             ] %}
-            {% for q, a in faqs %}
+            {% for q_key, a_key in faqs %}
             <div class="faq-item bg-white dark:bg-cardbg border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
                 <button type="button" onclick="this.closest('.faq-item').classList.toggle('open')" class="w-full flex items-center justify-between gap-3 px-4 py-3 text-left text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100">
-                    <span>{{ q }}</span>
+                    <span>{{ t(q_key) }}</span>
                     <i class="fa-solid fa-chevron-down faq-chevron text-gold text-xs transition-transform"></i>
                 </button>
                 <div class="faq-answer px-4 text-xs sm:text-sm text-gray-500 dark:text-zinc-400">
-                    <p class="pb-3">{{ a|safe }}</p>
+                    <p class="pb-3">{{ t(a_key)|safe }}</p>
                 </div>
             </div>
             {% endfor %}

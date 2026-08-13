@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="km" class="dark">
+<html lang="{{ current_lang }}" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,7 +52,7 @@
 
                 <div class="flex-1 max-w-sm sm:max-w-md mx-3 sm:mx-8">
                     <form action="{{ url_for('search') }}" method="get" class="relative">
-                        <input name="q" value="{{ request.args.get('q', '') }}" type="text" placeholder="ស្វែងរក..." class="w-full bg-gray-100 dark:bg-zinc-900/90 text-xs sm:text-sm text-gray-800 dark:text-gray-200 rounded-full pl-9 pr-4 py-1.5 sm:py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
+                        <input name="q" value="{{ request.args.get('q', '') }}" type="text" placeholder="{{ t('nav.search_placeholder') }}" class="w-full bg-gray-100 dark:bg-zinc-900/90 text-xs sm:text-sm text-gray-800 dark:text-gray-200 rounded-full pl-9 pr-4 py-1.5 sm:py-2 border border-gray-300 dark:border-zinc-700/80 focus:outline-none focus:border-gold transition-colors">
                         <button type="submit" class="absolute left-3 top-2.5 sm:top-3 text-gray-400 dark:text-zinc-400 text-xs">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </button>
@@ -64,9 +64,9 @@
                         <i id="themeIcon" class="fa-regular fa-moon text-base sm:text-lg"></i>
                     </button>
 
-                    <div class="flex items-center gap-1 bg-gray-100 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-800 px-2 py-1 rounded text-[11px] sm:text-xs">
-                        <img src="{{ url_for('static', filename='images/khicon.webp') }}" alt="ខ្មែរ" class="w-4 h-3 rounded-sm object-cover">
-                        <span class="text-gray-700 dark:text-zinc-300">ខ្មែរ</span>
+                    <div class="flex items-center bg-gray-100 dark:bg-zinc-900 border border-gray-300 dark:border-zinc-800 rounded text-[11px] sm:text-xs overflow-hidden">
+                        <a href="{{ url_for('set_language', lang='km', next=request.full_path) }}" class="px-2 py-1 transition {{ 'bg-gold text-black font-semibold' if current_lang == 'km' else 'text-gray-500 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-white' }}">KM</a>
+                        <a href="{{ url_for('set_language', lang='en', next=request.full_path) }}" class="px-2 py-1 transition {{ 'bg-gold text-black font-semibold' if current_lang == 'en' else 'text-gray-500 dark:text-zinc-400 hover:text-gray-800 dark:hover:text-white' }}">EN</a>
                     </div>
 
                     {% if current_user %}
@@ -75,7 +75,7 @@
                             <span class="hidden sm:inline text-gray-700 dark:text-zinc-300">{{ current_user.name }}</span>
                         </a>
                     {% else %}
-                        <a href="{{ url_for('login') }}" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs px-3 sm:px-4 py-1.5 rounded transition">ចូលប្រើ</a>
+                        <a href="{{ url_for('login') }}" class="bg-gold hover:bg-gold-light text-black font-semibold text-xs px-3 sm:px-4 py-1.5 rounded transition">{{ t('nav.login') }}</a>
                     {% endif %}
                 </div>
             </div>
@@ -97,7 +97,7 @@
     <!-- FOOTER (DESKTOP ONLY) -->
     <footer class="hidden md:block bg-gray-100 dark:bg-black border-t border-gray-200 dark:border-zinc-900 mt-12 py-8 text-xs text-gray-600 dark:text-zinc-400 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-zinc-600 text-[11px]">
-            <p>&copy; 2026 NITEANKH. រក្សាសិទ្ធិគ្រប់យ៉ាង។</p>
+            <p>&copy; 2026 NITEANKH. {{ t('footer.rights') }}</p>
         </div>
     </footer>
 
@@ -105,11 +105,11 @@
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-gray-200 dark:border-zinc-800/80 z-50 py-2.5 px-2 transition-colors duration-200">
         <div class="flex justify-around items-center text-[11px]">
             {% set tabs = [
-                (url_for('index'), 'fa-house', 'ទំព័រដើម'),
-                (url_for('movies'), 'fa-film', 'ភាពយន្ត'),
-                (url_for('membership'), 'fa-crown', 'សមាជិក'),
-                (url_for('wallet'), 'fa-wallet', 'កាបូប'),
-                (url_for('profile'), 'fa-user', 'ប្រវត្តិរូប'),
+                (url_for('index'), 'fa-house', t('nav.home')),
+                (url_for('movies'), 'fa-film', t('nav.movies')),
+                (url_for('membership'), 'fa-crown', t('nav.membership')),
+                (url_for('wallet'), 'fa-wallet', t('nav.wallet')),
+                (url_for('profile'), 'fa-user', t('nav.profile')),
             ] %}
             {% for href, icon, label in tabs %}
                 <a href="{{ href }}" class="flex flex-col items-center gap-1 transition {{ 'text-amber-600 dark:text-gold font-medium' if request.path == href else 'text-gray-500 dark:text-zinc-400 hover:text-amber-600 dark:hover:text-gold' }}">
