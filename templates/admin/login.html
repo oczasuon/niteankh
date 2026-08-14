@@ -29,7 +29,7 @@
 
         <div class="flex justify-center mb-4">
             <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded text-[11px] overflow-hidden">
-                <a href="{{ url_for('set_language', lang='km', next=request.full_path) }}" class="px-2 py-1 transition {{ 'bg-gold text-black font-semibold' if current_lang == 'km' else 'text-zinc-400 hover:text-white' }}">KM</a>
+                <a href="{{ url_for('set_language', lang='km', next=request.full_path) }}" class="px-2 py-1 transition {{ 'bg-gold text-black font-semibold' if current_lang == 'km' else 'text-zinc-400 hover:text-white' }}">ខ្មែរ</a>
                 <a href="{{ url_for('set_language', lang='en', next=request.full_path) }}" class="px-2 py-1 transition {{ 'bg-gold text-black font-semibold' if current_lang == 'en' else 'text-zinc-400 hover:text-white' }}">EN</a>
             </div>
         </div>
