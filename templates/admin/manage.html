@@ -45,7 +45,7 @@
                             <div class="flex items-center gap-3">
                                 <div class="relative w-16 sm:w-20 aspect-video rounded-md overflow-hidden bg-zinc-900 flex-shrink-0">
                                     {% if movie.has_thumbnail %}
-                                        <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+                                        <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover">
                                     {% else %}
                                         <div class="absolute inset-0 bg-gradient-to-r {{ movie.bg_grad }}"></div>
                                     {% endif %}

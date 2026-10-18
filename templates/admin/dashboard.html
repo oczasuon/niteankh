@@ -40,7 +40,7 @@
             <a href="{{ url_for('watch', movie_id=movie.id) }}" target="_blank" class="flex items-center gap-3 bg-cardbg border border-zinc-800 hover:border-gold/60 rounded-lg p-2.5 transition">
                 <div class="relative w-20 sm:w-24 aspect-video rounded-md overflow-hidden bg-zinc-900 flex-shrink-0">
                     {% if movie.has_thumbnail %}
-                        <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+                        <img src="{{ media_url('thumbnails', movie.thumbnail_filename) }}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover">
                     {% else %}
                         <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r {{ movie.bg_grad }}"><span class="text-[9px] font-bold text-white px-1 text-center drop-shadow">{{ movie.title }}</span></div>
                     {% endif %}

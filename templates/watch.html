@@ -161,7 +161,7 @@
                 <a href="{{ url_for('watch', movie_id=m.id) }}" class="flex gap-3 group cursor-pointer">
                     <div class="relative w-28 sm:w-32 aspect-video rounded-md overflow-hidden bg-zinc-900 flex-shrink-0">
                         {% if m.has_thumbnail %}
-                            <img src="{{ media_url('thumbnails', m.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+                            <img loading="lazy" decoding="async" src="{{ media_url('thumbnails', m.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
                         {% else %}
                             <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r {{ m.bg_grad }}">
                                 <span class="text-[10px] font-moul text-white px-1 text-center drop-shadow">{{ m.title }}</span>

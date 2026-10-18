@@ -74,7 +74,7 @@
                 <a href="{{ url_for('watch', movie_id=item.movie.id, ep=item.episode_num) }}" class="flex items-center gap-3 bg-white dark:bg-cardbg border border-gray-200 dark:border-zinc-800 hover:border-gold/60 rounded-lg p-2.5 transition">
                     <div class="relative w-24 sm:w-28 aspect-video rounded-md overflow-hidden bg-zinc-900 flex-shrink-0">
                         {% if item.movie.has_thumbnail %}
-                            <img src="{{ media_url('thumbnails', item.movie.thumbnail_filename) }}" class="absolute inset-0 w-full h-full object-cover">
+                            <img src="{{ media_url('thumbnails', item.movie.thumbnail_filename) }}" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover">
                         {% else %}
                             <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-r {{ item.movie.bg_grad }}"><span class="text-[9px] font-moul text-white px-1 text-center drop-shadow">{{ item.movie.title }}</span></div>
                         {% endif %}

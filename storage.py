@@ -3,6 +3,7 @@ deployment. Controlled entirely by environment variables — if the R2_* vars
 aren't set, everything falls back to local disk under static/, exactly as
 before. No caller needs to know which one is active."""
 
+import io
 import os
 from uuid import uuid4
 
@@ -10,6 +11,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ALLOWED_VIDEO_EXT = {'mp4', 'webm', 'ogg', 'mov', 'm4v'}
 ALLOWED_IMAGE_EXT = {'jpg', 'jpeg', 'png', 'webp', 'gif'}
+
+# Uploaded images in these subfolders are downscaled to fit (width, height)
+# and stored as WebP. 'settings' (payment QR) is left untouched on purpose —
+# recompressing a QR code risks making it unscannable.
+IMAGE_MAX_SIZE = {
+    'thumbnails': (1280, 1280),
+    'slides': (1920, 1080),
+    'avatars': (400, 400),
+}
+WEBP_QUALITY = 82
 
 # subfolder name -> local disk directory (used when R2 isn't configured)
 LOCAL_DIRS = {
@@ -66,6 +77,25 @@ def allowed_file(filename, allowed_ext):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_ext
 
 
+def optimize_image(stream, max_size):
+    """Downscales an image to fit within max_size and re-encodes it as WebP.
+    Returns the WebP bytes, or None if the stream isn't a decodable image.
+    Raw uploads (multi-MB PNG screenshots/posters) made the movie grid very
+    slow to load, since every card downloaded the full-size original."""
+    from PIL import Image, ImageOps
+    try:
+        img = Image.open(stream)
+        img = ImageOps.exif_transpose(img)
+        img.thumbnail(max_size, Image.LANCZOS)
+        if img.mode not in ('RGB', 'RGBA'):
+            img = img.convert('RGBA' if 'A' in img.getbands() or 'transparency' in img.info else 'RGB')
+        out = io.BytesIO()
+        img.save(out, 'WEBP', quality=WEBP_QUALITY, method=6)
+        return out.getvalue()
+    except Exception:
+        return None
+
+
 def save_file(file_storage, subfolder, allowed_ext):
     """Saves an uploaded file to R2 or local disk. Returns the generated
     filename, or None if the file was missing/had a disallowed extension."""
@@ -75,6 +105,22 @@ def save_file(file_storage, subfolder, allowed_ext):
         return None
 
     ext = file_storage.filename.rsplit('.', 1)[1].lower()
+
+    if subfolder in IMAGE_MAX_SIZE and ext != 'gif':
+        webp_bytes = optimize_image(file_storage.stream, IMAGE_MAX_SIZE[subfolder])
+        if webp_bytes is not None:
+            filename = f'{uuid4().hex}.webp'
+            if USE_R2:
+                get_r2_client().upload_fileobj(
+                    io.BytesIO(webp_bytes), R2_BUCKET, f'{subfolder}/{filename}',
+                    ExtraArgs={'ContentType': 'image/webp'},
+                )
+            else:
+                with open(os.path.join(LOCAL_DIRS[subfolder], filename), 'wb') as f:
+                    f.write(webp_bytes)
+            return filename
+        file_storage.stream.seek(0)  # not a decodable image — store it as uploaded
+
     filename = f'{uuid4().hex}.{ext}'
 
     if USE_R2:
