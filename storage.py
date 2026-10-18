@@ -82,13 +82,18 @@ def optimize_image(stream, max_size):
     Returns the WebP bytes, or None if the stream isn't a decodable image.
     Raw uploads (multi-MB PNG screenshots/posters) made the movie grid very
     slow to load, since every card downloaded the full-size original."""
-    from PIL import Image, ImageOps
+    from PIL import Image, ImageFilter, ImageOps
     try:
         img = Image.open(stream)
+        img.draft('RGB', max_size)  # JPEG only: decode at reduced scale — far less RAM on the Pi
         img = ImageOps.exif_transpose(img)
-        img.thumbnail(max_size, Image.LANCZOS)
         if img.mode not in ('RGB', 'RGBA'):
             img = img.convert('RGBA' if 'A' in img.getbands() or 'transparency' in img.info else 'RGB')
+        original_size = img.size
+        img.thumbnail(max_size, Image.LANCZOS)
+        if img.size != original_size:
+            # downscaling softens detail; a light unsharp mask restores crispness
+            img = img.filter(ImageFilter.UnsharpMask(radius=1, percent=60, threshold=2))
         out = io.BytesIO()
         img.save(out, 'WEBP', quality=WEBP_QUALITY, method=6)
         return out.getvalue()
